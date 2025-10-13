@@ -18,7 +18,7 @@ infrastructure:
 nodes:
   attacker-kali:
     type: vm
-    source: kali-linux-2025.2
+    source: kali_2025_2
     resources:
       cpu: 2
       ram: 4 GiB
@@ -33,18 +33,19 @@ nodes:
 
   sewercide-server:
     type: vm
-    source: sewercide-ctf
-    version: 0.1.0
+    source: ubuntu2404-server
     resources:
       cpu: 2
       ram: 2 GiB
     roles:
       user:
-        username: webmaster
+        username: user
+        password: ctf-challenge-2025
         entities:
           - target
     features:
       - server-static-ip
+      - sewercide-setup
 
 features:
   kali-static-ip:
@@ -58,6 +59,11 @@ features:
     source: debian-ip-setter
     environment:
       - STATIC_IP=10.1.1.9/30
+
+  sewercide-setup:
+    type: configuration
+    source: sewercide-ctf
+    version: 0.1.0
 
 entities:
   participant:

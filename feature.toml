@@ -1,0 +1,7 @@
+[feature]
+name = "sewercide-setup"
+description = "Installs and configures the Sewercide CTF web application"
+type = "configuration"
+
+[configuration]
+script = "src/install.sh"

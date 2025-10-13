@@ -8,15 +8,4 @@ readme = "README.md"
 categories = ["ctf", "web-exploitation", "argument-injection"]
 
 [content]
-type = "vm"
-
-[virtual-machine]
-accounts = [
-    { name = "webmaster", password = "" }
-]
-default_account = "webmaster"
-operating_system = "Ubuntu"
-architecture = "amd64"
-type = "OVA"
-file_path = "src/sewercide-ctf.ova"
-readme_path = "README.md"
+type = "feature"
