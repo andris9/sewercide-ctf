@@ -1,0 +1,102 @@
+%PDF-1.4
+1 0 obj
+<<
+/Type /Catalog
+/Pages 2 0 R
+>>
+endobj
+2 0 obj
+<<
+/Type /Pages
+/Kids [3 0 R]
+/Count 1
+>>
+endobj
+3 0 obj
+<<
+/Type /Page
+/Parent 2 0 R
+/Resources <<
+/Font <<
+/F1 <<
+/Type /Font
+/Subtype /Type1
+/BaseFont /Helvetica
+>>
+/F2 <<
+/Type /Font
+/Subtype /Type1
+/BaseFont /Helvetica-Bold
+>>
+>>
+>>
+/MediaBox [0 0 612 792]
+/Contents 4 0 R
+>>
+endobj
+4 0 obj
+<<
+/Length 850
+>>
+stream
+BT
+/F2 24 Tf
+50 750 Td
+(SEWERCIDE PLUMBING AND CO) Tj
+0 -30 Td
+/F1 14 Tf
+(Personalized Pricing Quote) Tj
+0 -40 Td
+/F2 12 Tf
+(Customer Information:) Tj
+0 -25 Td
+/F1 11 Tf
+(Name: NAME_PLACEHOLDER) Tj
+0 -20 Td
+(Email: EMAIL_PLACEHOLDER) Tj
+0 -40 Td
+/F2 12 Tf
+(Standard Service Rates:) Tj
+0 -25 Td
+/F1 11 Tf
+(Emergency Call-out Fee: $150) Tj
+0 -18 Td
+(Hourly Rate \(Standard\): $85/hour) Tj
+0 -18 Td
+(Hourly Rate \(Weekend\): $120/hour) Tj
+0 -18 Td
+(Drain Cleaning: $200-$500) Tj
+0 -18 Td
+(Water Heater Installation: $800-$1500) Tj
+0 -18 Td
+(Pipe Repair: $150-$400) Tj
+0 -40 Td
+/F2 10 Tf
+(Special Offer: 10% off first service!) Tj
+0 -30 Td
+/F1 9 Tf
+(Quote valid for 30 days from date of issue.) Tj
+0 -15 Td
+(Contact us: \(555\) 123-4567) Tj
+0 -15 Td
+(Emergency: \(555\) 999-0000) Tj
+0 -15 Td
+(https://sewercide.plumbers) Tj
+ET
+endstream
+endobj
+xref
+0 5
+0000000000 65535 f
+0000000009 00000 n
+0000000058 00000 n
+0000000115 00000 n
+0000000349 00000 n
+trailer
+<<
+/Size 5
+/Root 1 0 R
+>>
+startxref
+1249
+%%EOF

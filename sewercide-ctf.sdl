@@ -1,0 +1,170 @@
+name: Sewercide CTF Challenge
+description: Web exploitation challenge featuring argument injection vulnerability
+version: 0.1.0
+
+infrastructure:
+  network-switch: 1
+
+  attacker-kali:
+    count: 1
+    links:
+      - network-switch
+
+  sewercide-server:
+    count: 1
+    links:
+      - network-switch
+
+nodes:
+  attacker-kali:
+    type: vm
+    source: kali-linux-2025.2
+    resources:
+      cpu: 2
+      ram: 4 GiB
+    roles:
+      user:
+        username: kali
+        password: kali
+        entities:
+          - participant
+    features:
+      - kali-static-ip
+
+  sewercide-server:
+    type: vm
+    source: sewercide-ctf
+    version: 0.1.0
+    resources:
+      cpu: 2
+      ram: 2 GiB
+    roles:
+      user:
+        username: webmaster
+        entities:
+          - target
+    features:
+      - server-static-ip
+
+features:
+  kali-static-ip:
+    type: service
+    source: debian-ip-setter
+    environment:
+      - STATIC_IP=10.1.1.10/30
+
+  server-static-ip:
+    type: service
+    source: debian-ip-setter
+    environment:
+      - STATIC_IP=10.1.1.9/30
+
+entities:
+  participant:
+    name: "CTF Participant"
+    role: RED
+    description: "CTF participant attempting to capture the flag by attacking from Kali Linux"
+
+  target:
+    name: "Target Server"
+    role: BLUE
+    description: "Sewercide Plumbing web server containing the flag"
+
+stories:
+  main-story:
+    description: Sewercide Plumbing CTF Challenge
+    speed: 1
+    scripts:
+      - challenge-timeline
+
+scripts:
+  challenge-timeline:
+    description: Main challenge timeline
+    start: 0
+    end: 4h
+    events:
+      - challenge-start
+      - hint-1
+      - hint-2
+
+events:
+  challenge-start:
+    description: Challenge begins
+    start: 0
+    source: kali-linux-2025.2
+    content: |
+      # Sewercide Plumbing CTF Challenge
+
+      ## Objective
+      Your goal is to find and retrieve the flag from a target server on the network.
+
+      ## Your Environment
+      You are logged into a Kali Linux machine with full penetration testing tools.
+
+      **Credentials:**
+      - Username: `kali`
+      - Password: `kali`
+
+      ## Getting Started
+      1. Perform network reconnaissance to discover hosts on the network
+      2. Identify open ports and running services
+      3. Investigate any web applications you find
+      4. Look for vulnerabilities to exploit
+      5. Retrieve the flag
+
+      **Hints:**
+      - Use tools like `nmap`, `curl`, `burpsuite`, or similar
+      - The target may be running services on non-standard ports
+      - Web forms can sometimes have subtle input validation issues
+
+      Good luck!
+
+  hint-1:
+    description: First hint after 1 hour
+    start: 1h
+    source: kali-linux-2025.2
+    content: |
+      ## Hint 1
+
+      Have you performed a thorough port scan?
+      Try scanning all ports (1-65535) on discovered hosts.
+
+      Once you find the web application, pay attention to how it processes user input.
+      Not all input validation is created equal - some fields may be
+      more carefully sanitized than others.
+
+  hint-2:
+    description: Second hint after 2 hours
+    start: 2h
+    source: kali-linux-2025.2
+    content: |
+      ## Hint 2
+
+      Command injection might be blocked, but what about argument injection?
+      Sometimes the way arguments are passed to scripts can be exploited.
+
+      Think about what files might be interesting to exfiltrate from the target system.
+      Could there be SSH keys or other credentials worth looking for?
+
+goals:
+  find-flag:
+    description: Retrieve the flag from /etc/flag_*.txt
+    points: 100
+
+conditions:
+  flag-captured:
+    description: Participant has successfully retrieved the flag
+    source: sewercide-ctf
+
+metrics:
+  attempts:
+    description: Number of form submission attempts
+    type: counter
+
+  vulnerability-found:
+    description: Participant identified the vulnerability
+    type: boolean
+
+  flag-retrieved:
+    description: Flag successfully retrieved
+    type: boolean
