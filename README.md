@@ -23,15 +23,6 @@ You will be provided access to a **Kali Linux 2025.2** machine with standard pen
 3. **Exploitation**: Exploit discovered vulnerabilities
 4. **Flag Capture**: Retrieve the flag from the target system
 
-## Tools Available
-
-Your Kali Linux machine includes (but is not limited to):
-- `nmap` - Network scanner
-- `curl`, `wget` - HTTP clients
-- `burpsuite` - Web application testing
-- `ssh` - Secure shell client
-- Standard Unix utilities
-
 ## Tips
 
 - Start with network reconnaissance
@@ -39,18 +30,5 @@ Your Kali Linux machine includes (but is not limited to):
 - Web forms are often a good attack vector
 - Look for ways to read sensitive files from the server
 - SSH keys can be valuable for lateral movement
-
-## Scoring
-
-Successfully retrieving the flag awards **100 points**.
-
-## About
-
-This challenge tests your ability to:
-- Perform network reconnaissance
-- Identify web application vulnerabilities
-- Exploit input validation issues
-- Extract sensitive information
-- Use exfiltrated credentials for access
 
 Good luck!

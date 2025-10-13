@@ -1,11 +1,23 @@
 [package]
 name = "sewercide-ctf"
 description = "Sewercide Plumbing CTF Challenge - Web argument injection vulnerability"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Andris <andris@postalsys.com>"]
 license = "MIT"
 readme = "README.md"
 categories = ["ctf", "web-exploitation", "argument-injection"]
+assets = [
+    ["src/install.sh", "/tmp/sewercide-setup/install.sh", "755"],
+    ["src/www/index.php", "/tmp/sewercide-setup/www/index.php", "644"],
+    ["src/generate-personal-pricing.sh", "/tmp/sewercide-setup/generate-personal-pricing.sh", "755"],
+    ["src/nginx.conf", "/tmp/sewercide-setup/nginx.conf", "644"],
+    ["src/pricing-template.pdf", "/tmp/sewercide-setup/pricing-template.pdf", "644"],
+]
 
 [content]
 type = "feature"
+
+[feature]
+type = "service"
+action = "/tmp/sewercide-setup/install.sh"
+restarts = false

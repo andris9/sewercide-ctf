@@ -51,18 +51,12 @@ echo "[+] Setting up web directory structure..."
 mkdir -p /var/www/sewercide/www/static
 chown -R webmaster:webmaster /var/www/sewercide
 
-# Copy application files (assumes files are in /tmp/sewercide-setup/)
+# Copy application files (files are in /tmp/sewercide-setup/)
 echo "[+] Installing web application files..."
-if [ -d "/tmp/sewercide-setup/www" ]; then
-    cp -r /tmp/sewercide-setup/www/* /var/www/sewercide/www/
-fi
-if [ -f "/tmp/sewercide-setup/generate-personal-pricing.sh" ]; then
-    cp /tmp/sewercide-setup/generate-personal-pricing.sh /var/www/sewercide/
-    chmod +x /var/www/sewercide/generate-personal-pricing.sh
-fi
-if [ -f "/tmp/sewercide-setup/pricing-template.pdf" ]; then
-    cp /tmp/sewercide-setup/pricing-template.pdf /var/www/sewercide/
-fi
+cp -r /tmp/sewercide-setup/www /var/www/sewercide/
+cp /tmp/sewercide-setup/generate-personal-pricing.sh /var/www/sewercide/
+chmod +x /var/www/sewercide/generate-personal-pricing.sh
+cp /tmp/sewercide-setup/pricing-template.pdf /var/www/sewercide/
 
 # Set proper permissions
 chown -R webmaster:webmaster /var/www/sewercide
@@ -85,9 +79,7 @@ fi
 # Configure Nginx
 echo "[+] Configuring Nginx..."
 rm -f /etc/nginx/sites-enabled/default
-if [ -f "/tmp/sewercide-setup/nginx.conf" ]; then
-    cp /tmp/sewercide-setup/nginx.conf /etc/nginx/sites-enabled/sewercide
-fi
+cp /tmp/sewercide-setup/nginx.conf /etc/nginx/sites-enabled/sewercide
 
 # Enable and start services
 echo "[+] Enabling services..."
