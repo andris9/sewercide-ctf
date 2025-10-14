@@ -22,16 +22,28 @@ fi
 
 echo -e "${GREEN}[OK] Docker is installed${NC}"
 
+# Create Dockerfile.deputy if it doesn't exist
+if [ ! -f "Dockerfile.deputy" ]; then
+    echo -e "${YELLOW}Creating Dockerfile.deputy...${NC}"
+    cat > Dockerfile.deputy <<'DOCKERFILE_EOF'
+FROM ubuntu:24.04
+
+# Install Deputy CLI
+RUN apt-get update && \
+    apt-get install -y --allow-unauthenticated deputy && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /root
+
+CMD ["/bin/bash"]
+DOCKERFILE_EOF
+    echo -e "${GREEN}[OK] Dockerfile.deputy created${NC}"
+fi
+
 # Check if deputy-ubuntu image exists, build if not
 if ! docker images | grep -q deputy-ubuntu; then
     echo -e "${YELLOW}Deputy Docker image not found${NC}"
     echo "Building deputy-ubuntu:24.04 from Dockerfile.deputy..."
-
-    if [ ! -f "Dockerfile.deputy" ]; then
-        echo -e "${RED}Error: Dockerfile.deputy not found in current directory${NC}"
-        echo "Make sure you're running this script from the deputy-package directory."
-        exit 1
-    fi
 
     if ! docker build -f Dockerfile.deputy -t deputy-ubuntu:24.04 . ; then
         echo -e "${RED}Error: Failed to build deputy-ubuntu image${NC}"

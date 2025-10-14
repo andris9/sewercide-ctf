@@ -5,11 +5,6 @@ RUN apt-get update && \
     apt-get install -y --allow-unauthenticated deputy && \
     rm -rf /var/lib/apt/lists/*
 
-# Create deputy config directory with default registry
-RUN mkdir -p /root/.deputy && \
-    echo '[registries]' > /root/.deputy/configuration.toml && \
-    echo 'main-registry = { api = "https://deputy.ee-ng-cyber.ocr.cr14.net" }' >> /root/.deputy/configuration.toml
-
 WORKDIR /root
 
 CMD ["/bin/bash"]
