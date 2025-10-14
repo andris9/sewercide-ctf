@@ -59,6 +59,7 @@ coverage/
 
 # Docker
 .dockerignore
+Dockerfile.deputy
 
 # Python
 __pycache__/
