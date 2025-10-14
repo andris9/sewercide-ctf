@@ -88,5 +88,12 @@ echo ""
 echo "Package published to Deputy registry"
 echo "Git tag: v${NEW_VERSION}"
 echo ""
-echo "Verify with:"
-echo "  docker run --rm -v \"\${HOME}/.deputy:/root/.deputy\" deputy-ubuntu:24.04 sh -c 'deputy list 2>&1 | grep sewercide'"
+echo -e "${YELLOW}Verifying package in registry...${NC}"
+PACKAGE_INFO=$(docker run --rm -v "${HOME}/.deputy:/root/.deputy" deputy-ubuntu:24.04 sh -c 'deputy list 2>&1 | grep sewercide' 2>/dev/null)
+
+if [ -n "$PACKAGE_INFO" ]; then
+    echo -e "${GREEN}✓ Package verified:${NC} $PACKAGE_INFO"
+else
+    echo -e "${RED}✗ Could not verify package in registry${NC}"
+    echo "  Run manually: docker run --rm -v \"\${HOME}/.deputy:/root/.deputy\" deputy-ubuntu:24.04 sh -c 'deputy list 2>&1 | grep sewercide'"
+fi
