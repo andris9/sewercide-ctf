@@ -1,6 +1,6 @@
 name: Sewercide CTF Challenge
 description: Web exploitation challenge featuring argument injection vulnerability
-version: 0.1.0
+version: 0.1.3
 
 infrastructure:
   network-switch: 1
@@ -49,7 +49,7 @@ features:
   sewercide-setup:
     type: configuration
     source: sewercide-ctf
-    version: 0.1.2
+    version: 0.1.3
 
 entities:
   participant:
