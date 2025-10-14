@@ -81,8 +81,21 @@ Both VMs get IP addresses via DHCP from the network switch. Participants must di
 ### Release New Version
 
 ```bash
-./release.sh 0.2.0  # Bumps version, commits, tags, pushes to git and Deputy
+./release.sh 0.2.0
 ```
+
+The script will:
+
+1. Auto-detect package name from package.toml (prompts for confirmation)
+2. Auto-detect SDL file(s)
+3. Auto-detect git branch
+4. Update versions in package.toml and SDL file(s)
+5. Commit and tag
+6. Push to git origin
+7. Publish to Deputy registry
+8. Verify package in registry
+
+The script is reusable for any Deputy package, not specific to sewercide-ctf.
 
 ### Manual Publishing (if needed)
 
