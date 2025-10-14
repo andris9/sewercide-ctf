@@ -15,23 +15,24 @@ This is a **Deputy package** for deploying the "Sewercide CTF Challenge" on Open
 ## Architecture
 
 ### Multi-VM Network Setup
-- **Kali Linux 2025.2** (10.1.1.10/30): Attacker machine, participant entry point
-- **Target Server** (10.1.1.9/30): Ubuntu-based vulnerable web server
-- **Network**: Isolated /30 subnet with virtual switch
+- **Kali Linux 2025.2**: Attacker machine, participant accesses via OCR platform
+- **Target Server**: Ubuntu-based vulnerable web server
+- **Network**: Connected via virtual switch, IPs assigned via DHCP
 
 ### Challenge Flow
-1. Participant SSH into Kali (kali/kali)
-2. Discover target via nmap scan
+1. Participant accesses Kali VM through OCR platform (kali/kali)
+2. Discover target IP via nmap scan
 3. Find web app on port 9999
 4. Exploit argument injection to exfiltrate SSH key
-5. SSH to target using exfiltrated key
+5. SSH to target using exfiltrated key as webmaster
 6. Read flag from `/etc/flag_<random>.txt`
 
 ## Key Files
 
 ### Deputy Configuration
-- **`package.toml`**: Deputy package metadata (name, version, VM settings)
-- **`sewercide-ctf.sdl`**: SDL deployment file defining infrastructure, network, entities, story timeline, events, and scoring
+- **`package.toml`**: Deputy package metadata with assets configuration
+- **`sewercide-ctf.sdl`**: SDL deployment file defining infrastructure, network, nodes, entities
+- **`release.sh`**: Automated script for version bumping, git tagging, and Deputy publishing
 
 ### Infrastructure
 - **`src/install.sh`**: VM provisioning script - installs services, creates users, configures SSH (key-only), generates SSH keys, creates random flag file
@@ -64,42 +65,38 @@ infrastructure:
     links: [network-switch]
 ```
 
-### Static IP Assignment
-Uses `debian-ip-setter` feature from Deputy library:
-- Kali: `STATIC_IP=10.1.1.10/30`
-- Target: `STATIC_IP=10.1.1.9/30`
+### IP Assignment
+Both VMs get IP addresses via DHCP from the network switch. Participants must discover the target IP through network scanning.
 
-## Testing Commands
+## Publishing Commands
 
-### Local Docker Testing
+### Release New Version
 ```bash
-./test-install.sh  # Tests installation script in Docker container
+./release.sh 0.2.0  # Bumps version, commits, tags, pushes to git and Deputy
 ```
 
-### Deputy Publishing
+### Manual Publishing (if needed)
 ```bash
-deputy login       # Authenticate with API token
-deputy validate    # Validate package structure
-deputy publish     # Upload to Deputy library
+docker run --rm -v "$HOME/.deputy:/root/.deputy" -v "$(pwd):/workspace" -w /workspace deputy-ubuntu:24.04 deputy publish
 ```
 
 ## SDL Structure
 
-The SDL file follows Open Cyber Range format:
+The SDL file follows Open Cyber Range format (MVP version):
 - **infrastructure**: Defines switch, VMs, and network links
-- **nodes**: VM specifications (source, resources, roles, features)
-- **features**: Static IP configuration via debian-ip-setter
-- **entities**: Participant (RED) and Target (BLUE) roles
-- **stories/scripts/events**: 4-hour timeline with timed hints at 1h and 2h
-- **goals/conditions/metrics**: Scoring and tracking
+- **nodes**: VM specifications (source, resources, roles, features) - switch must be defined here too
+- **features**: Maps to sewercide-ctf Deputy package (assigned to roles)
+- **entities**: Participant (Red) and Target (Blue) roles - note capitalization
+
+Key syntax notes:
+- Features use map format: `feature-name: role-name`
+- Roles don't include passwords (handled by base images)
+- Role names like Red/Blue are capitalized as proper nouns
 
 ## Documentation Structure
 
-- **README.md**: Participant-facing (no solutions, emphasizes reconnaissance)
-- **DEPLOYMENT.md**: Admin guide with architecture, credentials, testing checklist
-- **PUBLISHING.md**: Complete workflow for creating OVA and publishing
-- **NETWORK.md**: Detailed network topology and IP configuration
-- **README-PACKAGE.md**: Package overview for all audiences
+- **README.md**: Participant-facing challenge description (no solutions)
+- **CLAUDE.md**: This file - guidance for Claude Code AI assistant
 
 ## Security Notes
 
