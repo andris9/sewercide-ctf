@@ -28,6 +28,22 @@ if [ ! -f "Dockerfile.deputy" ]; then
     cat > Dockerfile.deputy <<'DOCKERFILE_EOF'
 FROM ubuntu:24.04
 
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install prerequisites
+RUN apt-get update && apt-get install -y \
+    wget \
+    gnupg \
+    software-properties-common \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Add Open Cyber Range GPG key
+RUN wget -qO - https://nexus.ocr.cr14.net/repository/ocr-raw-hosted/ubuntu/gpg | gpg --dearmor -o /etc/apt/trusted.gpg.d/ocr.gpg || echo "GPG key download failed, proceeding without verification"
+
+# Add Open Cyber Range repository
+RUN echo 'deb [arch=amd64 trusted=yes] https://apt.opencyberrange.ee/ocr focal main' >> /etc/apt/sources.list.d/ocr.list
+
 # Install Deputy CLI
 RUN apt-get update && \
     apt-get install -y --allow-unauthenticated deputy && \
