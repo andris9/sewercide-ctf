@@ -1,0 +1,85 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Editor backup files
+*.swp
+*.swo
+*.swn
+*.bak
+*~
+.*.sw[a-z]
+
+# IDE
+.vscode/
+.idea/
+*.iml
+.project
+.classpath
+.settings/
+
+# Deputy credentials (IMPORTANT - never commit tokens!)
+.deputy/
+credentials.toml
+
+# Build artifacts
+*.tar
+*.tar.gz
+*.zip
+*.ova
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+*.tmp
+
+# Test artifacts
+test-output/
+coverage/
+
+# Docker
+.dockerignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+env/
+ENV/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files (may contain secrets)
+.env
+.env.local
+.env.*.local
+
+# Backup files from scripts
+*.toml.bak
+*.md.bak
+*.sh.bak

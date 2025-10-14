@@ -5,10 +5,12 @@ This guide explains how to set up the Deputy CLI on a new development machine us
 ## Prerequisites
 
 1. **Docker installed**
+
    - Download from: https://docs.docker.com/get-docker/
    - Verify: `docker --version`
 
 2. **Deputy Docker image**
+
    - Image name: `deputy-ubuntu:24.04`
    - Platform: `linux/amd64` (works on ARM Macs via emulation)
 
@@ -26,6 +28,7 @@ Run the automated setup script:
 ```
 
 The script will:
+
 1. Check for Docker installation
 2. Verify Deputy Docker image exists
 3. Prompt for your API token (input is hidden)
@@ -67,6 +70,7 @@ token = "YOUR_TOKEN_HERE"
 ```
 
 Set secure permissions:
+
 ```bash
 chmod 600 ~/.deputy/credentials.toml
 ```
@@ -86,6 +90,7 @@ docker run --rm \
 ```
 
 Make it executable:
+
 ```bash
 chmod +x ~/.local/bin/deputy
 ```
@@ -99,6 +104,7 @@ export PATH="$HOME/.local/bin:$PATH"
 ```
 
 Reload your shell:
+
 ```bash
 source ~/.bashrc  # or ~/.zshrc
 ```
@@ -112,6 +118,7 @@ deputy list
 ```
 
 You should see a list of available packages including:
+
 - `kali_2025_2/VM`
 - `ubuntu2404-server/VM`
 - `sewercide-ctf/Feature`
@@ -119,22 +126,26 @@ You should see a list of available packages including:
 ## Common Commands
 
 ### List Packages
+
 ```bash
 deputy list
 ```
 
 ### Publish Package
+
 ```bash
 cd /path/to/deputy-package
 deputy publish
 ```
 
 ### Automated Release
+
 ```bash
 ./release.sh 0.2.0
 ```
 
 This will:
+
 1. Bump version in `package.toml` and `sewercide-ctf.sdl`
 2. Commit changes to git
 3. Create git tag
@@ -148,11 +159,13 @@ This will:
 If you get an error about missing `deputy-ubuntu:24.04` image:
 
 1. Check available images:
+
    ```bash
    docker images | grep deputy
    ```
 
 2. Load the image if you have a tar file:
+
    ```bash
    docker load -i deputy-ubuntu.tar
    ```
@@ -166,7 +179,7 @@ If you get an error about missing `deputy-ubuntu:24.04` image:
 
 If `deputy list` times out:
 
-1. Check you're on the correct network (VPN may be required)
+1. Check you're on the correct network (VPN is required)
 2. Verify the registry URL is correct
 3. Check your API token is valid
 
@@ -175,21 +188,12 @@ If `deputy list` times out:
 If you get permission errors:
 
 1. Check credentials file permissions:
+
    ```bash
    chmod 600 ~/.deputy/credentials.toml
    ```
 
 2. Verify Docker has access to mounted volumes
-
-### Platform Warning on ARM Macs
-
-You may see:
-```
-WARNING: The requested image's platform (linux/amd64) does not match
-the detected host platform (linux/arm64/v8)
-```
-
-This is normal and can be ignored. Docker will use emulation automatically.
 
 ## Files Created
 

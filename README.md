@@ -13,6 +13,7 @@ Find and retrieve the flag from the target server on the network.
 You will be provided access to a **Kali Linux 2025.2** machine with standard penetration testing tools.
 
 **Credentials:**
+
 - Username: `kali`
 - Password: `kali`
 
