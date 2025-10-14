@@ -22,10 +22,9 @@ fi
 
 echo -e "${GREEN}[OK] Docker is installed${NC}"
 
-# Create Dockerfile.deputy if it doesn't exist
-if [ ! -f "Dockerfile.deputy" ]; then
-    echo -e "${YELLOW}Creating Dockerfile.deputy...${NC}"
-    cat > Dockerfile.deputy <<'DOCKERFILE_EOF'
+# Always create Dockerfile.deputy
+echo -e "${YELLOW}Creating Dockerfile.deputy...${NC}"
+cat > Dockerfile.deputy <<'DOCKERFILE_EOF'
 FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -53,8 +52,7 @@ WORKDIR /root
 
 CMD ["/bin/bash"]
 DOCKERFILE_EOF
-    echo -e "${GREEN}[OK] Dockerfile.deputy created${NC}"
-fi
+echo -e "${GREEN}[OK] Dockerfile.deputy created${NC}"
 
 # Check if deputy-ubuntu image exists, build if not
 if ! docker images | grep -q deputy-ubuntu; then
