@@ -9,15 +9,12 @@ This guide explains how to set up the Deputy CLI on a new development machine us
    - Download from: https://docs.docker.com/get-docker/
    - Verify: `docker --version`
 
-2. **Deputy Docker image**
-
-   - Image name: `deputy-ubuntu:24.04`
-   - Platform: `linux/amd64` (works on ARM Macs via emulation)
-
-3. **Deputy API Token**
-   - Get from: https://deputy.ee-ng-cyber.ocr.cr14.net
+2. **Deputy API Token**
+   - Get from your Deputy registry (default: https://deputy.ee-ng-cyber.ocr.cr14.net)
    - Navigate to your account settings
    - Generate a new API token
+
+The setup script will automatically build the `deputy-ubuntu:24.04` Docker image from the included `Dockerfile.deputy` if it doesn't already exist.
 
 ## Quick Setup
 
@@ -30,7 +27,7 @@ Run the automated setup script:
 The script will:
 
 1. Check for Docker installation
-2. Verify Deputy Docker image exists
+2. Build `deputy-ubuntu:24.04` image from Dockerfile.deputy (if not already built)
 3. Prompt for Deputy registry URL (defaults to https://deputy.ee-ng-cyber.ocr.cr14.net)
 4. Prompt for your API token (input is hidden)
 5. Create `~/.deputy/configuration.toml`

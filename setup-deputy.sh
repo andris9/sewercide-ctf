@@ -22,16 +22,26 @@ fi
 
 echo -e "${GREEN}[OK] Docker is installed${NC}"
 
-# Check if deputy-ubuntu image exists
+# Check if deputy-ubuntu image exists, build if not
 if ! docker images | grep -q deputy-ubuntu; then
     echo -e "${YELLOW}Deputy Docker image not found${NC}"
-    echo "Please provide the Deputy Docker image."
-    echo "You can load it with: docker load -i deputy-ubuntu.tar"
-    echo "Or pull it from a registry if available."
-    exit 1
-fi
+    echo "Building deputy-ubuntu:24.04 from Dockerfile.deputy..."
 
-echo -e "${GREEN}[OK] Deputy Docker image found${NC}"
+    if [ ! -f "Dockerfile.deputy" ]; then
+        echo -e "${RED}Error: Dockerfile.deputy not found in current directory${NC}"
+        echo "Make sure you're running this script from the deputy-package directory."
+        exit 1
+    fi
+
+    if ! docker build -f Dockerfile.deputy -t deputy-ubuntu:24.04 . ; then
+        echo -e "${RED}Error: Failed to build deputy-ubuntu image${NC}"
+        exit 1
+    fi
+
+    echo -e "${GREEN}[OK] Deputy Docker image built successfully${NC}"
+else
+    echo -e "${GREEN}[OK] Deputy Docker image found${NC}"
+fi
 
 # Create Deputy configuration directory
 DEPUTY_CONFIG_DIR="$HOME/.deputy"
