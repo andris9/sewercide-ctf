@@ -210,6 +210,38 @@ After setup, you'll have:
 └── deputy               # Wrapper script
 ```
 
+## Uninstall
+
+To completely remove Deputy CLI:
+
+```bash
+./uninstall-deputy.sh
+```
+
+This will remove:
+- `~/.deputy/` directory (config and credentials)
+- `~/.local/bin/deputy` wrapper script
+- `deputy-ubuntu:24.04` Docker image
+- `Dockerfile.deputy` (if in current directory)
+
+### Manual Uninstall
+
+If you prefer to uninstall manually:
+
+```bash
+# Remove configuration and credentials
+rm -rf ~/.deputy
+
+# Remove wrapper script
+rm -f ~/.local/bin/deputy
+
+# Remove Docker image
+docker rmi deputy-ubuntu:24.04
+
+# Remove Dockerfile (if in current directory)
+rm -f Dockerfile.deputy
+```
+
 ## Security Notes
 
 - **Never commit** `~/.deputy/credentials.toml` to git
