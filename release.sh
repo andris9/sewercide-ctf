@@ -5,6 +5,7 @@ set -e
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Function to display usage
@@ -29,10 +30,41 @@ if ! [[ "$NEW_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
 fi
 
 # Check if we're in the right directory
-if [ ! -f "package.toml" ] || [ ! -f "sewercide-ctf.sdl" ]; then
-    echo -e "${RED}Error: Must run from deputy-package directory${NC}"
+if [ ! -f "package.toml" ]; then
+    echo -e "${RED}Error: package.toml not found. Must run from deputy-package directory${NC}"
     exit 1
 fi
+
+# Auto-detect package name from package.toml
+DEFAULT_PACKAGE_NAME=$(grep '^name = ' package.toml | head -1 | sed 's/name = "\(.*\)"/\1/')
+
+# Ask for package name (with default)
+echo -e "${BLUE}Package name [${DEFAULT_PACKAGE_NAME}]:${NC} "
+read -r PACKAGE_NAME
+if [ -z "$PACKAGE_NAME" ]; then
+    PACKAGE_NAME="$DEFAULT_PACKAGE_NAME"
+fi
+
+# Auto-detect SDL file (look for .sdl files)
+SDL_FILES=(*.sdl)
+if [ ${#SDL_FILES[@]} -eq 0 ]; then
+    echo -e "${YELLOW}Warning: No .sdl file found${NC}"
+    SDL_FILE=""
+elif [ ${#SDL_FILES[@]} -eq 1 ]; then
+    SDL_FILE="${SDL_FILES[0]}"
+    echo -e "${BLUE}SDL file: ${SDL_FILE}${NC}"
+else
+    echo -e "${YELLOW}Multiple .sdl files found:${NC}"
+    select SDL_FILE in "${SDL_FILES[@]}" "None"; do
+        if [ "$SDL_FILE" = "None" ]; then
+            SDL_FILE=""
+        fi
+        break
+    done
+fi
+
+# Auto-detect git branch
+GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "master")
 
 # Get current version from package.toml
 CURRENT_VERSION=$(grep '^version = ' package.toml | head -1 | sed 's/version = "\(.*\)"/\1/')
@@ -57,19 +89,26 @@ echo -e "${GREEN}[1/6] Updating version in package.toml...${NC}"
 sed -i.bak "s/^version = \".*\"/version = \"${NEW_VERSION}\"/" package.toml
 rm package.toml.bak
 
-echo -e "${GREEN}[2/6] Updating version in sewercide-ctf.sdl...${NC}"
-sed -i.bak "s/version: [0-9]*\.[0-9]*\.[0-9]*/version: ${NEW_VERSION}/" sewercide-ctf.sdl
-rm sewercide-ctf.sdl.bak
+FILES_TO_COMMIT="package.toml"
+
+if [ -n "$SDL_FILE" ] && [ -f "$SDL_FILE" ]; then
+    echo -e "${GREEN}[2/6] Updating version in ${SDL_FILE}...${NC}"
+    sed -i.bak "s/version: [0-9]*\.[0-9]*\.[0-9]*/version: ${NEW_VERSION}/g" "$SDL_FILE"
+    rm "${SDL_FILE}.bak"
+    FILES_TO_COMMIT="$FILES_TO_COMMIT $SDL_FILE"
+else
+    echo -e "${YELLOW}[2/6] Skipping SDL update (no SDL file)${NC}"
+fi
 
 echo -e "${GREEN}[3/6] Committing version bump...${NC}"
-git add package.toml sewercide-ctf.sdl
+git add $FILES_TO_COMMIT
 git commit -m "Bump version to ${NEW_VERSION}"
 
 echo -e "${GREEN}[4/6] Creating git tag v${NEW_VERSION}...${NC}"
 git tag "v${NEW_VERSION}"
 
 echo -e "${GREEN}[5/6] Pushing to git origin...${NC}"
-git push origin master
+git push origin "$GIT_BRANCH"
 git push origin "v${NEW_VERSION}"
 
 echo -e "${GREEN}[6/6] Publishing to Deputy registry...${NC}"
@@ -89,11 +128,11 @@ echo "Package published to Deputy registry"
 echo "Git tag: v${NEW_VERSION}"
 echo ""
 echo -e "${YELLOW}Verifying package in registry...${NC}"
-PACKAGE_INFO=$(docker run --rm -v "${HOME}/.deputy:/root/.deputy" deputy-ubuntu:24.04 sh -c 'deputy list 2>&1 | grep sewercide' 2>/dev/null)
+PACKAGE_INFO=$(docker run --rm -v "${HOME}/.deputy:/root/.deputy" deputy-ubuntu:24.04 sh -c "deputy list 2>&1 | grep '$PACKAGE_NAME'" 2>/dev/null)
 
 if [ -n "$PACKAGE_INFO" ]; then
     echo -e "${GREEN}✓ Package verified:${NC} $PACKAGE_INFO"
 else
     echo -e "${RED}✗ Could not verify package in registry${NC}"
-    echo "  Run manually: docker run --rm -v \"\${HOME}/.deputy:/root/.deputy\" deputy-ubuntu:24.04 sh -c 'deputy list 2>&1 | grep sewercide'"
+    echo "  Run manually: docker run --rm -v \"\${HOME}/.deputy:/root/.deputy\" deputy-ubuntu:24.04 sh -c \"deputy list 2>&1 | grep '$PACKAGE_NAME'\""
 fi
