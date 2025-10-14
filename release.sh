@@ -39,7 +39,7 @@ fi
 DEFAULT_PACKAGE_NAME=$(grep '^name = ' package.toml | head -1 | sed 's/name = "\(.*\)"/\1/')
 
 # Ask for package name (with default)
-echo -e "${BLUE}Package name [${DEFAULT_PACKAGE_NAME}]:${NC} "
+echo -ne "${BLUE}Package name [${DEFAULT_PACKAGE_NAME}]:${NC} "
 read -r PACKAGE_NAME
 if [ -z "$PACKAGE_NAME" ]; then
     PACKAGE_NAME="$DEFAULT_PACKAGE_NAME"
