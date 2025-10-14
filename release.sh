@@ -131,8 +131,8 @@ echo -e "${YELLOW}Verifying package in registry...${NC}"
 PACKAGE_INFO=$(docker run --rm -v "${HOME}/.deputy:/root/.deputy" deputy-ubuntu:24.04 sh -c "deputy list 2>&1 | grep '$PACKAGE_NAME'" 2>/dev/null)
 
 if [ -n "$PACKAGE_INFO" ]; then
-    echo -e "${GREEN}✓ Package verified:${NC} $PACKAGE_INFO"
+    echo -e "${GREEN}[OK] Package verified:${NC} $PACKAGE_INFO"
 else
-    echo -e "${RED}✗ Could not verify package in registry${NC}"
+    echo -e "${RED}[ERROR] Could not verify package in registry${NC}"
     echo "  Run manually: docker run --rm -v \"\${HOME}/.deputy:/root/.deputy\" deputy-ubuntu:24.04 sh -c \"deputy list 2>&1 | grep '$PACKAGE_NAME'\""
 fi
