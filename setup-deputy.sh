@@ -20,7 +20,7 @@ if ! command -v docker &> /dev/null; then
     exit 1
 fi
 
-echo -e "${GREEN}✓ Docker is installed${NC}"
+echo -e "${GREEN}[OK] Docker is installed${NC}"
 
 # Check if deputy-ubuntu image exists
 if ! docker images | grep -q deputy-ubuntu; then
@@ -31,7 +31,7 @@ if ! docker images | grep -q deputy-ubuntu; then
     exit 1
 fi
 
-echo -e "${GREEN}✓ Deputy Docker image found${NC}"
+echo -e "${GREEN}[OK] Deputy Docker image found${NC}"
 
 # Create Deputy configuration directory
 DEPUTY_CONFIG_DIR="$HOME/.deputy"
@@ -64,7 +64,7 @@ main-registry = { api = "https://deputy.ee-ng-cyber.ocr.cr14.net" }
 download_path = "~/.deputy/downloads/"
 EOF
 
-echo -e "${GREEN}✓ Configuration file created at: ${DEPUTY_CONFIG_FILE}${NC}"
+echo -e "${GREEN}[OK] Configuration file created at: ${DEPUTY_CONFIG_FILE}${NC}"
 
 # Create credentials file
 DEPUTY_CREDENTIALS_FILE="$DEPUTY_CONFIG_DIR/credentials.toml"
@@ -75,7 +75,7 @@ token = "${DEPUTY_TOKEN}"
 EOF
 
 chmod 600 "$DEPUTY_CREDENTIALS_FILE"
-echo -e "${GREEN}✓ Credentials file created (permissions: 600)${NC}"
+echo -e "${GREEN}[OK] Credentials file created (permissions: 600)${NC}"
 
 # Create deputy wrapper script
 DEPUTY_WRAPPER="$HOME/.local/bin/deputy"
@@ -93,15 +93,15 @@ docker run --rm \
 EOF
 
 chmod +x "$DEPUTY_WRAPPER"
-echo -e "${GREEN}✓ Deputy wrapper script created at: ${DEPUTY_WRAPPER}${NC}"
+echo -e "${GREEN}[OK] Deputy wrapper script created at: ${DEPUTY_WRAPPER}${NC}"
 
 # Test the configuration
 echo ""
 echo -e "${YELLOW}Testing Deputy CLI...${NC}"
 if "$DEPUTY_WRAPPER" list &> /dev/null; then
-    echo -e "${GREEN}✓ Deputy CLI is working!${NC}"
+    echo -e "${GREEN}[OK] Deputy CLI is working!${NC}"
 else
-    echo -e "${YELLOW}⚠ Could not connect to Deputy registry${NC}"
+    echo -e "${YELLOW}[WARNING] Could not connect to Deputy registry${NC}"
     echo "This might be normal if you're not on the network."
 fi
 
