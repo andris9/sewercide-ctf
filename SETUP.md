@@ -31,11 +31,12 @@ The script will:
 
 1. Check for Docker installation
 2. Verify Deputy Docker image exists
-3. Prompt for your API token (input is hidden)
-4. Create `~/.deputy/configuration.toml`
-5. Create `~/.deputy/credentials.toml` with your token
-6. Create `~/.local/bin/deputy` wrapper script
-7. Test the connection
+3. Prompt for Deputy registry URL (defaults to https://deputy.ee-ng-cyber.ocr.cr14.net)
+4. Prompt for your API token (input is hidden)
+5. Create `~/.deputy/configuration.toml`
+6. Create `~/.deputy/credentials.toml` with your token
+7. Create `~/.local/bin/deputy` wrapper script
+8. Test the connection
 
 ## Manual Setup
 

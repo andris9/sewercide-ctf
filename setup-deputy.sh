@@ -43,10 +43,20 @@ echo -e "${YELLOW}Setting up Deputy configuration...${NC}"
 # Create directory if it doesn't exist
 mkdir -p "$DEPUTY_CONFIG_DIR"
 
+# Prompt for registry URL
+DEFAULT_REGISTRY="https://deputy.ee-ng-cyber.ocr.cr14.net"
+echo ""
+echo -ne "${BLUE}Deputy registry URL [${DEFAULT_REGISTRY}]:${NC} "
+read -r REGISTRY_URL
+if [ -z "$REGISTRY_URL" ]; then
+    REGISTRY_URL="$DEFAULT_REGISTRY"
+fi
+echo -e "${GREEN}Using registry: ${REGISTRY_URL}${NC}"
+
 # Prompt for API token
 echo ""
 echo -e "${BLUE}Please enter your Deputy API token:${NC}"
-echo "(You can generate one at: https://deputy.ee-ng-cyber.ocr.cr14.net)"
+echo "(You can generate one at: ${REGISTRY_URL})"
 read -s -p "Token: " DEPUTY_TOKEN
 echo ""
 
@@ -58,7 +68,7 @@ fi
 # Create configuration file
 cat > "$DEPUTY_CONFIG_FILE" <<EOF
 [registries]
-main-registry = { api = "https://deputy.ee-ng-cyber.ocr.cr14.net" }
+main-registry = { api = "${REGISTRY_URL}" }
 
 [package]
 download_path = "~/.deputy/downloads/"
