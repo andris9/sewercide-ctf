@@ -32,18 +32,13 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Install prerequisites
 RUN apt-get update && apt-get install -y \
     wget \
-    gnupg \
-    software-properties-common \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Add Open Cyber Range GPG key
-RUN wget -qO - https://nexus.ocr.cr14.net/repository/ocr-raw-hosted/ubuntu/gpg | gpg --dearmor -o /etc/apt/trusted.gpg.d/ocr.gpg || echo "GPG key download failed, proceeding without verification"
-
-# Add Open Cyber Range repository
+# Add Open Cyber Range repository without GPG verification
 RUN echo 'deb [arch=amd64 trusted=yes] https://apt.opencyberrange.ee/ocr focal main' >> /etc/apt/sources.list.d/ocr.list
 
-# Install Deputy CLI
+# Install Deputy CLI without signature verification
 RUN apt-get update && \
     apt-get install -y --allow-unauthenticated deputy && \
     rm -rf /var/lib/apt/lists/*
@@ -59,7 +54,7 @@ if ! docker images | grep -q deputy-ubuntu; then
     echo -e "${YELLOW}Deputy Docker image not found${NC}"
     echo "Building deputy-ubuntu:24.04 from Dockerfile.deputy..."
 
-    if ! docker build -f Dockerfile.deputy -t deputy-ubuntu:24.04 . ; then
+    if ! docker build --platform linux/amd64 -f Dockerfile.deputy -t deputy-ubuntu:24.04 . ; then
         echo -e "${RED}Error: Failed to build deputy-ubuntu image${NC}"
         exit 1
     fi
@@ -131,6 +126,7 @@ cat > "$DEPUTY_WRAPPER" <<'EOF'
 #!/bin/bash
 # Deputy CLI wrapper for Docker on ARM Mac
 docker run --rm \
+    --platform linux/amd64 \
     -v "${HOME}/.deputy:/root/.deputy" \
     -v "$(pwd):/workspace" \
     -w /workspace \
