@@ -30,6 +30,7 @@ $RECYCLE.BIN/
 .project
 .classpath
 .settings/
+.claude/
 
 # Deputy credentials (IMPORTANT - never commit tokens!)
 .deputy/
