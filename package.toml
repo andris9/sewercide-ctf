@@ -7,7 +7,6 @@ license = "MIT"
 readme = "README.md"
 categories = ["ctf", "web-exploitation", "argument-injection"]
 
-# Files to be copied into the VM
 assets = [
     [
         "src/install.sh",
@@ -17,6 +16,11 @@ assets = [
     [
         "src/www/index.php",
         "/tmp/sewercide-setup/www/index.php",
+        "644",
+    ],
+    [
+        "src/www/phpinfo.php",
+        "/tmp/sewercide-setup/www/phpinfo.php",
         "644",
     ],
     [
@@ -34,7 +38,7 @@ assets = [
         "/tmp/sewercide-setup/pricing-template.pdf",
         "644",
     ],
-]
+] # Files to be copied into the VM
 
 # Main content: feature (service) that installs the web challenge
 [content]

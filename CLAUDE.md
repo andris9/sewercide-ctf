@@ -42,6 +42,7 @@ This is a **Deputy package** for deploying the "Sewercide CTF Challenge" on Open
 - **`src/install.sh`**: VM provisioning script - installs services, creates users, configures SSH (key-only), generates SSH keys, creates random flag file
 - **`src/nginx.conf`**: Nginx config for port 9999
 - **`src/www/index.php`**: Main web application (single-file PHP router)
+- **`src/www/phpinfo.php`**: Runs and prints phpinfo()
 - **`src/generate-personal-pricing.sh`**: Shell script with **intentional vulnerability** - accepts unquoted positional arguments
 
 ### Vulnerability Details
