@@ -38,6 +38,11 @@ assets = [
         "/tmp/sewercide-setup/pricing-template.pdf",
         "644",
     ],
+    [
+        "src/debs",
+        "/tmp/sewercide-setup/debs",
+        "755",
+    ],
 ] # Files to be copied into the VM
 
 # Main content: feature (service) that installs the web challenge

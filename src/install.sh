@@ -65,37 +65,13 @@ cleanup() {
 # Set trap to ensure cleanup happens even if script fails
 trap cleanup EXIT
 
-# Wait for network connectivity
-echo "[+] Waiting for network connectivity..."
-MAX_ATTEMPTS=30
-ATTEMPT=0
-while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
-    if ping -c 1 -W 2 8.8.8.8 >/dev/null 2>&1 || ping -c 1 -W 2 1.1.1.1 >/dev/null 2>&1; then
-        echo "[+] Network is available"
-        break
-    fi
-    ATTEMPT=$((ATTEMPT + 1))
-    echo "[.] Waiting for network... attempt $ATTEMPT/$MAX_ATTEMPTS"
-    sleep 2
-done
+echo "[+] Installing required packages from bundled .deb files..."
+# Install all .deb files in order (dpkg will handle dependencies)
+cd /tmp/sewercide-setup/debs
+sudo dpkg -i *.deb 2>/dev/null || true
 
-if [ $ATTEMPT -eq $MAX_ATTEMPTS ]; then
-    echo "[!] Warning: Network connectivity check timed out, proceeding anyway..."
-fi
-
-echo "[+] Installing required packages..."
-sudo apt-get update
-sudo apt-get install -y \
-    php-fpm \
-    php-cli \
-    nginx \
-    openssh-server \
-    openssh-client \
-    rsyslog \
-    openssl
-
-# Clean up package cache
-sudo rm -rf /var/lib/apt/lists/*
+# Fix any dependency issues
+sudo apt-get install -f -y --no-install-recommends 2>/dev/null || echo "[!] Warning: Some dependencies may not have been configured"
 
 # Create 'webmaster' user (no password set - key-based auth only)
 echo "[+] Creating webmaster user..."
