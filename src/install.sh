@@ -15,7 +15,7 @@ echo ""
 export DEBIAN_FRONTEND=noninteractive
 
 # Password for sudo (set by OCR platform based on SDL role password)
-SUDO_PASSWORD="${SUDO_PASSWORD:-user}"
+SUDO_PASSWORD="${SUDO_PASSWORD:-K9mPqR2vN8wT5hJ7bG4xL3zU6yC1sF0aE}"
 
 # Enable passwordless sudo temporarily for this installation
 echo "[+] Configuring temporary passwordless sudo..."
@@ -23,10 +23,41 @@ SUDOERS_FILE="/etc/sudoers.d/sewercide-install-temp"
 echo "$SUDO_PASSWORD" | sudo -S sh -c "echo '$(whoami) ALL=(ALL) NOPASSWD: ALL' > $SUDOERS_FILE"
 echo "$SUDO_PASSWORD" | sudo -S chmod 440 "$SUDOERS_FILE"
 
-# Cleanup function to remove passwordless sudo configuration
+# Cleanup function to remove passwordless sudo configuration and traces
 cleanup() {
     echo "[+] Removing temporary passwordless sudo configuration..."
     sudo rm -f "$SUDOERS_FILE"
+
+    echo "[+] Cleaning up installation traces..."
+
+    # Clear bash history for current user
+    history -c
+    history -w
+    > ~/.bash_history
+
+    # Clear system logs that might contain installation commands
+    sudo truncate -s 0 /var/log/auth.log 2>/dev/null || true
+    sudo truncate -s 0 /var/log/syslog 2>/dev/null || true
+    sudo truncate -s 0 /var/log/kern.log 2>/dev/null || true
+    sudo truncate -s 0 /var/log/dpkg.log 2>/dev/null || true
+    sudo truncate -s 0 /var/log/apt/history.log 2>/dev/null || true
+    sudo truncate -s 0 /var/log/apt/term.log 2>/dev/null || true
+
+    # Clear journalctl logs
+    sudo journalctl --vacuum-time=1s 2>/dev/null || true
+
+    # Remove temporary files
+    sudo rm -rf /tmp/sewercide-setup 2>/dev/null || true
+
+    # Clear last login records
+    sudo truncate -s 0 /var/log/wtmp 2>/dev/null || true
+    sudo truncate -s 0 /var/log/btmp 2>/dev/null || true
+    sudo truncate -s 0 /var/log/lastlog 2>/dev/null || true
+
+    # Clear command history from memory
+    unset HISTFILE
+
+    echo "[+] Cleanup complete - installation traces removed"
 }
 
 # Set trap to ensure cleanup happens even if script fails
