@@ -64,7 +64,7 @@ entities:
     description: "Sewercide Plumbing web server containing the flag"
 
 events:
-  - name: intro
+  intro:
     type: message
     description: "Opening briefing and challenge banner"
     source: sewercide-ctf
