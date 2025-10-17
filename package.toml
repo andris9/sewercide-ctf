@@ -39,8 +39,18 @@ assets = [
         "644",
     ],
     [
-        "src/debs.tar.gz",
-        "/tmp/sewercide-setup/debs.tar.gz",
+        "src/debs.tar.gz.partaa",
+        "/tmp/sewercide-setup/debs.tar.gz.partaa",
+        "644",
+    ],
+    [
+        "src/debs.tar.gz.partab",
+        "/tmp/sewercide-setup/debs.tar.gz.partab",
+        "644",
+    ],
+    [
+        "src/debs.tar.gz.partac",
+        "/tmp/sewercide-setup/debs.tar.gz.partac",
         "644",
     ],
 ] # Files to be copied into the VM

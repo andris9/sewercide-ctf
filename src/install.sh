@@ -65,9 +65,11 @@ cleanup() {
 # Set trap to ensure cleanup happens even if script fails
 trap cleanup EXIT
 
-echo "[+] Extracting bundled packages..."
+echo "[+] Reassembling and extracting bundled packages..."
 cd /tmp/sewercide-setup
+cat debs.tar.gz.part* > debs.tar.gz
 tar xzf debs.tar.gz
+rm debs.tar.gz debs.tar.gz.part*
 
 echo "[+] Installing required packages from bundled .deb files..."
 # Install all .deb files in order (dpkg will handle dependencies)
