@@ -79,6 +79,18 @@ sudo dpkg -i *.deb 2>/dev/null || true
 # Fix any dependency issues
 sudo apt-get install -f -y --no-install-recommends 2>/dev/null || echo "[!] Warning: Some dependencies may not have been configured"
 
+# Ensure critical packages are actually installed
+echo "[+] Verifying critical packages are installed..."
+for pkg in nginx php8.3-fpm php8.3-cli openssh-server openssh-client; do
+    if ! dpkg -l | grep -q "^ii.*${pkg}"; then
+        echo "[+] Installing ${pkg}..."
+        cd /tmp/sewercide-setup/debs
+        sudo dpkg -i ${pkg}*.deb 2>/dev/null || true
+    else
+        echo "[i] ${pkg} already installed"
+    fi
+done
+
 # Create 'webmaster' user (no password set - key-based auth only)
 echo "[+] Creating webmaster user..."
 if ! id -u webmaster >/dev/null 2>&1; then
