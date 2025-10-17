@@ -39,10 +39,6 @@ nodes:
       cpu: 2
       ram: 2 GiB
     roles:
-      server-admin:
-        username: root
-        entities:
-          - target
       server-user:
         username: user
         entities:
@@ -60,9 +56,19 @@ entities:
   participant:
     name: "CTF Participant"
     role: Red
-    description: "CTF participant attempting to capture the flag by attacking from Kali Linux"
+    description: "CTF participant attacking from Kali Linux"
 
   target:
     name: "Target Server"
     role: Blue
     description: "Sewercide Plumbing web server containing the flag"
+
+events:
+  - name: intro
+    type: message
+    description: "Opening briefing and challenge banner"
+    source: sewercide-ctf
+    version: 0.2.11
+    trigger:
+      type: time
+      offset: 0s
