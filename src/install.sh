@@ -185,17 +185,17 @@ else
 fi
 
 # Enable and start services
-echo "[+] Enabling services..."
-sudo systemctl enable ssh
-sudo systemctl enable nginx
-sudo systemctl enable "${PHP_FPM_SERVICE}"
-sudo systemctl enable rsyslog
+echo "[+] Enabling and starting services..."
+# Use || true to continue even if service doesn't exist
+sudo systemctl enable ssh 2>/dev/null || echo "[!] SSH service not available"
+sudo systemctl enable nginx 2>/dev/null || echo "[!] Nginx service not available"
+sudo systemctl enable "${PHP_FPM_SERVICE}" 2>/dev/null || echo "[!] PHP-FPM service not available"
+sudo systemctl enable rsyslog 2>/dev/null || echo "[!] Rsyslog service not available"
 
-echo "[+] Starting services..."
-sudo systemctl restart rsyslog
-sudo systemctl restart "${PHP_FPM_SERVICE}"
-sudo systemctl restart nginx
-sudo systemctl restart ssh
+sudo systemctl restart rsyslog 2>/dev/null || echo "[!] Could not restart rsyslog"
+sudo systemctl restart "${PHP_FPM_SERVICE}" 2>/dev/null || echo "[!] Could not restart ${PHP_FPM_SERVICE}"
+sudo systemctl restart nginx 2>/dev/null || echo "[!] Could not restart nginx"
+sudo systemctl restart ssh 2>/dev/null || sudo systemctl restart sshd 2>/dev/null || echo "[!] Could not restart SSH"
 
 echo "=== Installation Complete ==="
 echo "Web application: http://<IP>:9999"
