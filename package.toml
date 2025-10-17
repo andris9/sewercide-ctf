@@ -1,7 +1,7 @@
 [package]
 name = "sewercide-ctf"
 description = "Sewercide Plumbing CTF Challenge - Web argument injection vulnerability"
-version = "0.1.9"
+version = "0.2.0"
 authors = ["Andris <andris@postalsys.com>"]
 license = "MIT"
 readme = "README.md"
