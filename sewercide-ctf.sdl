@@ -3,21 +3,20 @@ description: Web exploitation challenge featuring argument injection vulnerabili
 version: 0.2.14
 
 infrastructure:
-  network-switch:
-    type: switch
+  switch: 1
 
   attacker-kali:
     count: 1
-    link:
-      - network-switch
+    links:
+      - switch
 
   sewercide-server:
     count: 1
-    link:
-      - network-switch
+    links:
+      - switch
 
 nodes:
-  network-switch:
+  switch:
     type: switch
 
   attacker-kali:
