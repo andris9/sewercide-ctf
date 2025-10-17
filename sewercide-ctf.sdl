@@ -63,12 +63,26 @@ entities:
     role: Blue
     description: "Sewercide Plumbing web server containing the flag"
 
+injects:
+  intro-banner:
+    source:
+      name: sewercide-ctf
+      version: 0.2.13
+    from-entity: target
+    to-entities:
+      - participant
+    description: "Challenge briefing and instructions"
+
 events:
   intro:
-    type: message
+    injects:
+      - intro-banner
     description: "Opening briefing and challenge banner"
-    source: sewercide-ctf
-    version: 0.2.13
-    trigger:
-      type: time
-      offset: 0s
+
+scripts:
+  main:
+    start-time: 0
+    end-time: 4 hour
+    speed: 1
+    events:
+      intro: 0
