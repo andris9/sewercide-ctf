@@ -9,50 +9,40 @@ echo "[i] Working directory: $(pwd)"
 echo "[i] Hostname: $(hostname)"
 echo "[i] OS: $(cat /etc/os-release | grep PRETTY_NAME | cut -d'"' -f2)"
 echo "[i] Sudo available: $(command -v sudo >/dev/null && echo 'yes' || echo 'no')"
+echo "[i] Environment variables:"
+env | grep -E '^(USER|PASSWORD|SUDO|ROLE)' || echo "  (no relevant env vars found)"
 echo ""
 
 # Prevent interactive prompts during package installation
 export DEBIAN_FRONTEND=noninteractive
 
-# Password for sudo (set by OCR platform based on SDL role password)
-SUDO_PASSWORD="${SUDO_PASSWORD:-K9mPqR2vN8wT5hJ7bG4xL3zU6yC1sF0aE}"
-
-# Enable passwordless sudo temporarily for this installation
-echo "[+] Configuring temporary passwordless sudo..."
-SUDOERS_FILE="/etc/sudoers.d/sewercide-install-temp"
-echo "$SUDO_PASSWORD" | sudo -S sh -c "echo '$(whoami) ALL=(ALL) NOPASSWD: ALL' > $SUDOERS_FILE"
-echo "$SUDO_PASSWORD" | sudo -S chmod 440 "$SUDOERS_FILE"
-
-# Cleanup function to remove passwordless sudo configuration and traces
+# Cleanup function to remove installation traces
 cleanup() {
-    echo "[+] Removing temporary passwordless sudo configuration..."
-    sudo rm -f "$SUDOERS_FILE"
-
     echo "[+] Cleaning up installation traces..."
 
-    # Clear bash history for current user
+    # Clear bash history for root
     history -c
     history -w
     > ~/.bash_history
 
     # Clear system logs that might contain installation commands
-    sudo truncate -s 0 /var/log/auth.log 2>/dev/null || true
-    sudo truncate -s 0 /var/log/syslog 2>/dev/null || true
-    sudo truncate -s 0 /var/log/kern.log 2>/dev/null || true
-    sudo truncate -s 0 /var/log/dpkg.log 2>/dev/null || true
-    sudo truncate -s 0 /var/log/apt/history.log 2>/dev/null || true
-    sudo truncate -s 0 /var/log/apt/term.log 2>/dev/null || true
+    truncate -s 0 /var/log/auth.log 2>/dev/null || true
+    truncate -s 0 /var/log/syslog 2>/dev/null || true
+    truncate -s 0 /var/log/kern.log 2>/dev/null || true
+    truncate -s 0 /var/log/dpkg.log 2>/dev/null || true
+    truncate -s 0 /var/log/apt/history.log 2>/dev/null || true
+    truncate -s 0 /var/log/apt/term.log 2>/dev/null || true
 
     # Clear journalctl logs
-    sudo journalctl --vacuum-time=1s 2>/dev/null || true
+    journalctl --vacuum-time=1s 2>/dev/null || true
 
     # Remove temporary files
-    sudo rm -rf /tmp/sewercide-setup 2>/dev/null || true
+    rm -rf /tmp/sewercide-setup 2>/dev/null || true
 
     # Clear last login records
-    sudo truncate -s 0 /var/log/wtmp 2>/dev/null || true
-    sudo truncate -s 0 /var/log/btmp 2>/dev/null || true
-    sudo truncate -s 0 /var/log/lastlog 2>/dev/null || true
+    truncate -s 0 /var/log/wtmp 2>/dev/null || true
+    truncate -s 0 /var/log/btmp 2>/dev/null || true
+    truncate -s 0 /var/log/lastlog 2>/dev/null || true
 
     # Clear command history from memory
     unset HISTFILE
@@ -64,8 +54,8 @@ cleanup() {
 trap cleanup EXIT
 
 echo "[+] Installing required packages..."
-sudo apt-get update
-sudo apt-get install -y \
+apt-get update
+apt-get install -y \
     php-fpm \
     php-cli \
     nginx \
@@ -75,17 +65,17 @@ sudo apt-get install -y \
     openssl
 
 # Clean up package cache
-sudo rm -rf /var/lib/apt/lists/*
+rm -rf /var/lib/apt/lists/*
 
 # Create 'webmaster' user (no password set - key-based auth only)
 echo "[+] Creating webmaster user..."
 if ! id -u webmaster >/dev/null 2>&1; then
-    sudo useradd -m -s /bin/bash webmaster
+    useradd -m -s /bin/bash webmaster
 fi
 
 # Configure SSH - disable password authentication and root login
 echo "[+] Configuring SSH for key-based authentication only..."
-sudo mkdir -p /var/run/sshd
+mkdir -p /var/run/sshd
 # Append authoritative settings to avoid brittle sed matches
 {
     echo ''
@@ -95,38 +85,38 @@ sudo mkdir -p /var/run/sshd
     echo 'ChallengeResponseAuthentication no'
     echo 'UsePAM yes'
     echo 'PubkeyAuthentication yes'
-} | sudo tee -a /etc/ssh/sshd_config > /dev/null
+} | tee -a /etc/ssh/sshd_config > /dev/null
 
 # Generate SSH key pair for webmaster (requires openssh-client)
 echo "[+] Generating SSH key pair for webmaster..."
-sudo su - webmaster -c "mkdir -p /home/webmaster/.ssh && chmod 700 /home/webmaster/.ssh"
-if ! sudo su - webmaster -c "test -f /home/webmaster/.ssh/id_rsa"; then
-    sudo su - webmaster -c "ssh-keygen -t rsa -b 4096 -f /home/webmaster/.ssh/id_rsa -N '' -C 'webmaster@sewercide'"
+su - webmaster -c "mkdir -p /home/webmaster/.ssh && chmod 700 /home/webmaster/.ssh"
+if ! su - webmaster -c "test -f /home/webmaster/.ssh/id_rsa"; then
+    su - webmaster -c "ssh-keygen -t rsa -b 4096 -f /home/webmaster/.ssh/id_rsa -N '' -C 'webmaster@sewercide'"
 fi
-sudo su - webmaster -c "cat /home/webmaster/.ssh/id_rsa.pub >> /home/webmaster/.ssh/authorized_keys"
-sudo su - webmaster -c "chmod 600 /home/webmaster/.ssh/id_rsa /home/webmaster/.ssh/authorized_keys"
+su - webmaster -c "cat /home/webmaster/.ssh/id_rsa.pub >> /home/webmaster/.ssh/authorized_keys"
+su - webmaster -c "chmod 600 /home/webmaster/.ssh/id_rsa /home/webmaster/.ssh/authorized_keys"
 
 # Create flag file with random name
 echo "[+] Creating flag file..."
 FLAG_NAME="flag_$(openssl rand -hex 16).txt"
-echo "flag{exposed_webmaster}" | sudo tee "/etc/${FLAG_NAME}" > /dev/null
-sudo chmod 644 "/etc/${FLAG_NAME}"
+echo "flag{exposed_webmaster}" | tee "/etc/${FLAG_NAME}" > /dev/null
+chmod 644 "/etc/${FLAG_NAME}"
 echo "[+] Flag created at: /etc/${FLAG_NAME}"
 
 # Setup web directory structure
 echo "[+] Setting up web directory structure..."
-sudo mkdir -p /var/www/sewercide/www/static
-sudo chown -R webmaster:webmaster /var/www/sewercide
+mkdir -p /var/www/sewercide/www/static
+chown -R webmaster:webmaster /var/www/sewercide
 
 # Copy application files (files are in /tmp/sewercide-setup/)
 echo "[+] Installing web application files..."
-sudo cp -r /tmp/sewercide-setup/www /var/www/sewercide/
-sudo cp /tmp/sewercide-setup/generate-personal-pricing.sh /var/www/sewercide/
-sudo chmod +x /var/www/sewercide/generate-personal-pricing.sh
-sudo cp /tmp/sewercide-setup/pricing-template.pdf /var/www/sewercide/
+cp -r /tmp/sewercide-setup/www /var/www/sewercide/
+cp /tmp/sewercide-setup/generate-personal-pricing.sh /var/www/sewercide/
+chmod +x /var/www/sewercide/generate-personal-pricing.sh
+cp /tmp/sewercide-setup/pricing-template.pdf /var/www/sewercide/
 
 # Set proper permissions
-sudo chown -R webmaster:webmaster /var/www/sewercide
+chown -R webmaster:webmaster /var/www/sewercide
 
 # Configure PHP-FPM (robust discovery without requiring php CLI)
 echo "[+] Configuring PHP-FPM..."
@@ -135,22 +125,22 @@ PHP_FPM_SERVICE="php-fpm"  # fallback service name (rare)
 
 if [ -n "${PHP_FPM_CONF}" ] && [ -f "${PHP_FPM_CONF}" ]; then
     # Update pool owners to run PHP as 'webmaster'
-    sudo sed -i 's/^user *= *.*/user = webmaster/'   "${PHP_FPM_CONF}"
-    sudo sed -i 's/^group *= *.*/group = webmaster/' "${PHP_FPM_CONF}"
+    sed -i 's/^user *= *.*/user = webmaster/'   "${PHP_FPM_CONF}"
+    sed -i 's/^group *= *.*/group = webmaster/' "${PHP_FPM_CONF}"
     # listen.owner/group might not exist; replace if present, append otherwise
     if grep -q '^listen.owner' "${PHP_FPM_CONF}"; then
-        sudo sed -i 's/^listen.owner *= *.*/listen.owner = webmaster/' "${PHP_FPM_CONF}"
+        sed -i 's/^listen.owner *= *.*/listen.owner = webmaster/' "${PHP_FPM_CONF}"
     else
-        echo 'listen.owner = webmaster' | sudo tee -a "${PHP_FPM_CONF}" > /dev/null
+        echo 'listen.owner = webmaster' | tee -a "${PHP_FPM_CONF}" > /dev/null
     fi
     if grep -q '^listen.group' "${PHP_FPM_CONF}"; then
-        sudo sed -i 's/^listen.group *= *.*/listen.group = webmaster/' "${PHP_FPM_CONF}"
+        sed -i 's/^listen.group *= *.*/listen.group = webmaster/' "${PHP_FPM_CONF}"
     else
-        echo 'listen.group = webmaster' | sudo tee -a "${PHP_FPM_CONF}" > /dev/null
+        echo 'listen.group = webmaster' | tee -a "${PHP_FPM_CONF}" > /dev/null
     fi
 
     # Ensure www-data can access webmaster group if needed
-    sudo usermod -a -G webmaster www-data || true
+    usermod -a -G webmaster www-data || true
 
     # Derive version to get proper systemd unit (phpX.Y-fpm)
     # /etc/php/<ver>/fpm/pool.d/www.conf -> take "<ver>"
@@ -164,12 +154,12 @@ fi
 
 # Configure Nginx
 echo "[+] Configuring Nginx..."
-sudo rm -f /etc/nginx/sites-enabled/default
-sudo cp /tmp/sewercide-setup/nginx.conf /etc/nginx/sites-enabled/sewercide
+rm -f /etc/nginx/sites-enabled/default
+cp /tmp/sewercide-setup/nginx.conf /etc/nginx/sites-enabled/sewercide
 
 # Replace PHP version placeholder in nginx config
 if [ -n "${PHP_VER}" ]; then
-    sudo sed -i "s/PHP_VERSION_PLACEHOLDER/php${PHP_VER}/g" /etc/nginx/sites-enabled/sewercide
+    sed -i "s/PHP_VERSION_PLACEHOLDER/php${PHP_VER}/g" /etc/nginx/sites-enabled/sewercide
     echo "[+] Configured Nginx to use php${PHP_VER}-fpm.sock"
 else
     echo "[!] Warning: Could not detect PHP version, nginx config may need manual adjustment"
@@ -177,16 +167,16 @@ fi
 
 # Enable and start services
 echo "[+] Enabling services..."
-sudo systemctl enable ssh
-sudo systemctl enable nginx
-sudo systemctl enable "${PHP_FPM_SERVICE}"
-sudo systemctl enable rsyslog
+systemctl enable ssh
+systemctl enable nginx
+systemctl enable "${PHP_FPM_SERVICE}"
+systemctl enable rsyslog
 
 echo "[+] Starting services..."
-sudo systemctl restart rsyslog
-sudo systemctl restart "${PHP_FPM_SERVICE}"
-sudo systemctl restart nginx
-sudo systemctl restart ssh
+systemctl restart rsyslog
+systemctl restart "${PHP_FPM_SERVICE}"
+systemctl restart nginx
+systemctl restart ssh
 
 echo "=== Installation Complete ==="
 echo "Web application: http://<IP>:9999"

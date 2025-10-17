@@ -49,7 +49,7 @@ nodes:
         entities:
           - target
     features:
-      sewercide-setup: server-user
+      sewercide-setup: server-admin
 
 features:
   sewercide-setup:
