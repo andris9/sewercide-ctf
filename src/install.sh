@@ -2,6 +2,14 @@
 set -euo pipefail
 
 echo "=== Sewercide CTF Challenge Installation ==="
+echo "[i] Running as user: $(whoami)"
+echo "[i] User ID: $(id -u)"
+echo "[i] Groups: $(id -Gn)"
+echo "[i] Working directory: $(pwd)"
+echo "[i] Hostname: $(hostname)"
+echo "[i] OS: $(cat /etc/os-release | grep PRETTY_NAME | cut -d'"' -f2)"
+echo "[i] Sudo available: $(command -v sudo >/dev/null && echo 'yes' || echo 'no')"
+echo ""
 
 # Prevent interactive prompts during package installation
 export DEBIAN_FRONTEND=noninteractive
