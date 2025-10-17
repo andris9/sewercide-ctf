@@ -10,8 +10,14 @@ NC='\033[0m' # No Color
 
 # Function to display usage
 usage() {
-    echo "Usage: $0 <version>"
+    echo "Usage: $0 <version> [-y|--yes] [-p|--package <name>]"
     echo "Example: $0 0.2.0"
+    echo "Example (non-interactive): $0 0.2.0 -y"
+    echo "Example (with package name): $0 0.2.0 -y -p sewercide-ctf"
+    echo ""
+    echo "Options:"
+    echo "  -y, --yes              Skip all confirmations (non-interactive mode)"
+    echo "  -p, --package <name>   Specify package name (skip auto-detection prompt)"
     exit 1
 }
 
@@ -22,6 +28,28 @@ if [ -z "$1" ]; then
 fi
 
 NEW_VERSION="$1"
+shift
+
+# Parse additional arguments
+NON_INTERACTIVE=false
+PACKAGE_NAME=""
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -y|--yes)
+            NON_INTERACTIVE=true
+            shift
+            ;;
+        -p|--package)
+            PACKAGE_NAME="$2"
+            shift 2
+            ;;
+        *)
+            echo -e "${RED}Error: Unknown option $1${NC}"
+            usage
+            ;;
+    esac
+done
 
 # Validate version format (basic semver check)
 if ! [[ "$NEW_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
@@ -38,11 +66,20 @@ fi
 # Auto-detect package name from package.toml
 DEFAULT_PACKAGE_NAME=$(grep '^name = ' package.toml | head -1 | sed 's/name = "\(.*\)"/\1/')
 
-# Ask for package name (with default)
-echo -ne "${BLUE}Package name [${DEFAULT_PACKAGE_NAME}]:${NC} "
-read -r PACKAGE_NAME
+# Ask for package name (with default) unless already provided
 if [ -z "$PACKAGE_NAME" ]; then
-    PACKAGE_NAME="$DEFAULT_PACKAGE_NAME"
+    if [ "$NON_INTERACTIVE" = true ]; then
+        PACKAGE_NAME="$DEFAULT_PACKAGE_NAME"
+        echo -e "${BLUE}Package name: ${PACKAGE_NAME}${NC}"
+    else
+        echo -ne "${BLUE}Package name [${DEFAULT_PACKAGE_NAME}]:${NC} "
+        read -r PACKAGE_NAME
+        if [ -z "$PACKAGE_NAME" ]; then
+            PACKAGE_NAME="$DEFAULT_PACKAGE_NAME"
+        fi
+    fi
+else
+    echo -e "${BLUE}Package name: ${PACKAGE_NAME}${NC}"
 fi
 
 # Auto-detect SDL file (look for .sdl files)
@@ -71,12 +108,16 @@ CURRENT_VERSION=$(grep '^version = ' package.toml | head -1 | sed 's/version = "
 echo -e "${YELLOW}Current version: ${CURRENT_VERSION}${NC}"
 echo -e "${YELLOW}New version: ${NEW_VERSION}${NC}"
 
-# Confirm with user
-read -p "Continue with release? (y/n) " -n 1 -r
-echo
-if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    echo "Release cancelled"
-    exit 0
+# Confirm with user unless in non-interactive mode
+if [ "$NON_INTERACTIVE" = false ]; then
+    read -p "Continue with release? (y/n) " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        echo "Release cancelled"
+        exit 0
+    fi
+else
+    echo -e "${GREEN}Non-interactive mode: proceeding with release${NC}"
 fi
 
 # Check for uncommitted changes
