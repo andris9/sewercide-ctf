@@ -65,6 +65,24 @@ cleanup() {
 # Set trap to ensure cleanup happens even if script fails
 trap cleanup EXIT
 
+# Wait for network connectivity
+echo "[+] Waiting for network connectivity..."
+MAX_ATTEMPTS=30
+ATTEMPT=0
+while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
+    if ping -c 1 -W 2 8.8.8.8 >/dev/null 2>&1 || ping -c 1 -W 2 1.1.1.1 >/dev/null 2>&1; then
+        echo "[+] Network is available"
+        break
+    fi
+    ATTEMPT=$((ATTEMPT + 1))
+    echo "[.] Waiting for network... attempt $ATTEMPT/$MAX_ATTEMPTS"
+    sleep 2
+done
+
+if [ $ATTEMPT -eq $MAX_ATTEMPTS ]; then
+    echo "[!] Warning: Network connectivity check timed out, proceeding anyway..."
+fi
+
 echo "[+] Installing required packages..."
 sudo apt-get update
 sudo apt-get install -y \
