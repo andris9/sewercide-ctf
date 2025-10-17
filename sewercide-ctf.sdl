@@ -45,7 +45,6 @@ nodes:
           - target
       server-user:
         username: user
-        password: "Profile8-7Lie8-7!Rev"
         entities:
           - target
     features:
