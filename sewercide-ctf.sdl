@@ -39,12 +39,16 @@ nodes:
       cpu: 2
       ram: 2 GiB
     roles:
+      server-admin:
+        username: root
+        entities:
+          - target
       server-user:
         username: user
         entities:
           - target
     features:
-      sewercide-setup: server-user
+      sewercide-setup: server-admin
 
 features:
   sewercide-setup:
