@@ -45,11 +45,11 @@ nodes:
           - target
       server-user:
         username: user
-        password: "K9mPqR2vN8wT5hJ7bG4xL3zU6yC1sF0aE"
+        password: "Profile8-7Lie8-7!Rev"
         entities:
           - target
     features:
-      sewercide-setup: server-admin
+      sewercide-setup: server-user
 
 features:
   sewercide-setup:
