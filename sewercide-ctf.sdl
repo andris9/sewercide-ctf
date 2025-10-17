@@ -45,10 +45,11 @@ nodes:
           - target
       server-user:
         username: user
+        password: user
         entities:
           - target
     features:
-      sewercide-setup: server-admin
+      sewercide-setup: server-user
 
 features:
   sewercide-setup:
