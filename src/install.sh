@@ -162,10 +162,17 @@ if [ -n "${PHP_FPM_CONF}" ] && [ -f "${PHP_FPM_CONF}" ]; then
     fi
 else
     echo "[!] Warning: PHP-FPM pool config not found under /etc/php/*/fpm/pool.d/www.conf"
+    # Try to detect PHP version from installed packages
+    PHP_VER="$(dpkg -l | grep php.*-fpm | head -1 | awk '{print $2}' | grep -oP 'php\K[0-9.]+' || echo '8.3')"
+    if [ -n "${PHP_VER}" ]; then
+        PHP_FPM_SERVICE="php${PHP_VER}-fpm"
+        echo "[i] Detected PHP version: ${PHP_VER}"
+    fi
 fi
 
 # Configure Nginx
 echo "[+] Configuring Nginx..."
+sudo mkdir -p /etc/nginx/sites-enabled
 sudo rm -f /etc/nginx/sites-enabled/default
 sudo cp /tmp/sewercide-setup/nginx.conf /etc/nginx/sites-enabled/sewercide
 
