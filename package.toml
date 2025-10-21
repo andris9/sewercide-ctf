@@ -48,9 +48,3 @@ type = "feature"
 type = "service"
 action = "/tmp/sewercide-setup/install.sh"
 restarts = false
-
-# Secondary content: banner (event)
-[[contents]]
-type = "event"
-file_path = "banner.md"
-description = "Introductory banner text for the Sewercide CTF challenge"

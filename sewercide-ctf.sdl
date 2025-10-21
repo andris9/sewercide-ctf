@@ -50,16 +50,16 @@ nodes:
 
 features:
   kali-static-ip:
-    type: configuration
+    type: service
     source: static-ip-setter
-    config:
-      ipv4: 10.1.1.10/24
+    environment:
+      - STATIC_IP=10.1.1.10/24
 
   server-static-ip:
-    type: configuration
+    type: service
     source: static-ip-setter
-    config:
-      ipv4: 10.1.1.20/24
+    environment:
+      - STATIC_IP=10.1.1.20/24
 
   sewercide-setup:
     type: configuration
@@ -80,8 +80,8 @@ entities:
 injects:
   intro-banner:
     source:
-      name: sewercide-ctf
-      version: 0.2.18
+      name: sewercide-ctf-banner
+      version: 0.1.0
     from-entity: target
     to-entities:
       - participant
