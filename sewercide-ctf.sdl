@@ -30,10 +30,12 @@ nodes:
         username: kali
         entities:
           - participant
+    features:
+      kali-static-ip: kali-user
 
   sewercide-server:
     type: vm
-    source: ubuntu2404-server
+    source: ubuntu2404-base-web
     resources:
       cpu: 2
       ram: 2 GiB
@@ -43,9 +45,22 @@ nodes:
         entities:
           - target
     features:
+      server-static-ip: server-user
       sewercide-setup: server-user
 
 features:
+  kali-static-ip:
+    type: configuration
+    source: static-ip-setter
+    config:
+      ipv4: 10.1.1.10/24
+
+  server-static-ip:
+    type: configuration
+    source: static-ip-setter
+    config:
+      ipv4: 10.1.1.20/24
+
   sewercide-setup:
     type: configuration
     source: sewercide-ctf

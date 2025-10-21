@@ -13,22 +13,10 @@ echo "[i] Environment variables:"
 env | grep -E '^(USER|PASSWORD|SUDO|ROLE)' || echo "  (no relevant env vars found)"
 echo ""
 
-# Prevent interactive prompts during package installation
-export DEBIAN_FRONTEND=noninteractive
+# Note: ubuntu2404-base-web 'user' already has NOPASSWD sudo access
 
-# Password for sudo (default password from ubuntu2404-server package)
-SUDO_PASSWORD="${SUDO_PASSWORD:-Profile8-7Lie8-7!Rev}"
-
-# Enable passwordless sudo temporarily for this installation
-echo "[+] Configuring temporary passwordless sudo..."
-SUDOERS_FILE="/etc/sudoers.d/sewercide-install-temp"
-echo "$SUDO_PASSWORD" | sudo -S sh -c "echo '$(whoami) ALL=(ALL) NOPASSWD: ALL' > $SUDOERS_FILE"
-echo "$SUDO_PASSWORD" | sudo -S chmod 440 "$SUDOERS_FILE"
-
-# Cleanup function to remove passwordless sudo configuration and traces
+# Cleanup function to remove installation traces
 cleanup() {
-    echo "[+] Removing temporary passwordless sudo configuration..."
-    sudo rm -f "$SUDOERS_FILE"
 
     echo "[+] Cleaning up installation traces..."
 
@@ -65,29 +53,13 @@ cleanup() {
 # Set trap to ensure cleanup happens even if script fails
 trap cleanup EXIT
 
-echo "[+] Reassembling and extracting bundled packages..."
-cd /tmp/sewercide-setup
-cat debs.tar.gz.part* > debs.tar.gz
-tar xzf debs.tar.gz
-rm debs.tar.gz debs.tar.gz.part*
-
-echo "[+] Installing required packages from bundled .deb files..."
-# Install all .deb files in order (dpkg will handle dependencies)
-cd /tmp/sewercide-setup/debs
-sudo dpkg -i *.deb 2>/dev/null || true
-
-# Fix any dependency issues
-sudo apt-get install -f -y --no-install-recommends 2>/dev/null || echo "[!] Warning: Some dependencies may not have been configured"
-
-# Ensure critical packages are actually installed
-echo "[+] Verifying critical packages are installed..."
+echo "[+] Verifying required packages are installed..."
+# ubuntu2404-base-web includes nginx and php8.3-fpm pre-installed (but disabled)
 for pkg in nginx php8.3-fpm php8.3-cli openssh-server openssh-client; do
-    if ! dpkg -l | grep -q "^ii.*${pkg}"; then
-        echo "[+] Installing ${pkg}..."
-        cd /tmp/sewercide-setup/debs
-        sudo dpkg -i ${pkg}*.deb 2>/dev/null || true
-    else
+    if dpkg -l | grep -q "^ii.*${pkg}"; then
         echo "[i] ${pkg} already installed"
+    else
+        echo "[!] Warning: ${pkg} not found - ubuntu2404-base-web should include nginx and php8.3-fpm"
     fi
 done
 
@@ -210,5 +182,5 @@ sudo systemctl restart nginx 2>/dev/null || echo "[!] Could not restart nginx"
 sudo systemctl restart ssh 2>/dev/null || sudo systemctl restart sshd 2>/dev/null || echo "[!] Could not restart SSH"
 
 echo "=== Installation Complete ==="
-echo "Web application: http://<IP>:9999"
+echo "Web application: http://<IP>:8080"
 echo "SSH: Key-based authentication only on port 22"
