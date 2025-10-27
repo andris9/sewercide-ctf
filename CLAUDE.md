@@ -36,6 +36,7 @@ This is a **Deputy package** for deploying the "Sewercide CTF Challenge" on Open
 - **`package.toml`**: Deputy package metadata with assets configuration
 - **`sewercide-ctf.sdl`**: SDL deployment file defining infrastructure, network, nodes, entities
 - **`release.sh`**: Automated script for version bumping, git tagging, and Deputy publishing
+- **`event-banner/`**: Separate Deputy package for challenge briefing banner (Event type)
 
 ### Infrastructure
 
@@ -81,8 +82,18 @@ Both VMs get IP addresses via DHCP from the network switch. Participants must di
 
 ### Release New Version
 
+Publish the main feature package:
+
 ```bash
 ./release.sh 0.2.0
+```
+
+Publish the banner package (keep versions in sync):
+
+```bash
+cd event-banner
+./release.sh 0.2.0 -y
+cd ..
 ```
 
 The script will:
@@ -112,12 +123,16 @@ The SDL file follows Open Cyber Range format (MVP version):
 - **nodes**: VM specifications (source, resources, roles, features) - switch must be defined here too
 - **features**: Maps to sewercide-ctf Deputy package (assigned to roles)
 - **entities**: Participant (Red) and Target (Blue) roles - note capitalization
+- **injects**: References sewercide-ctf-banner event package for challenge briefing
+- **events**: Triggers banner display at exercise start
+- **scripts**: Timeline configuration (4-hour exercise duration)
 
 Key syntax notes:
 
 - Features use map format: `feature-name: role-name`
 - Roles don't include passwords (handled by base images)
 - Role names like Red/Blue are capitalized as proper nouns
+- Banners must be separate Event packages, cannot be embedded in SDL
 
 ## Documentation Structure
 
