@@ -50,16 +50,20 @@ nodes:
 
 features:
   kali-static-ip:
-    type: service
+    type: configuration
     source: static-ip-setter
+    version: "1.0.0"
     environment:
-      - STATIC_IP=10.1.1.10/24
+      STATIC_IP: "10.1.1.10/24"
+      IFACE: "ens3"
 
   server-static-ip:
-    type: service
+    type: configuration
     source: static-ip-setter
+    version: "1.0.0"
     environment:
-      - STATIC_IP=10.1.1.20/24
+      STATIC_IP: "10.1.1.20/24"
+      IFACE: "ens3"
 
   sewercide-setup:
     type: configuration
