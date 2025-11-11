@@ -55,7 +55,7 @@ features:
     version: "1.0.0"
     environment:
       - STATIC_IP=10.1.1.10/24
-      - IFACE=ens3
+      - IFACE=ens192
 
   server-static-ip:
     type: configuration
@@ -63,7 +63,7 @@ features:
     version: "1.0.0"
     environment:
       - STATIC_IP=10.1.1.20/24
-      - IFACE=ens3
+      - IFACE=ens192
 
   sewercide-setup:
     type: configuration
