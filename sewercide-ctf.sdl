@@ -86,7 +86,7 @@ injects:
   intro-banner:
     source:
       name: sewercide-ctf-banner
-      version: 0.2.22
+      version: 0.2.21
     from-entity: target
     to-entities:
       - participant

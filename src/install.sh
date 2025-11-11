@@ -172,15 +172,20 @@ fi
 echo "[+] Enabling and starting services..."
 
 # Enable SSH (try both 'ssh' and 'sshd' service names)
-echo "[+] Enabling SSH service..."
-if sudo systemctl enable ssh 2>/dev/null; then
-    echo "[i] SSH service enabled"
-    sudo systemctl start ssh || echo "[!] Warning: Could not start ssh service"
-elif sudo systemctl enable sshd 2>/dev/null; then
-    echo "[i] SSHD service enabled"
-    sudo systemctl start sshd || echo "[!] Warning: Could not start sshd service"
+echo "[+] Unmasking, enabling and starting SSH service..."
+# SSH may be masked by default, so unmask it first
+if sudo systemctl unmask ssh 2>/dev/null; then
+    echo "[i] SSH service unmasked"
+    sudo systemctl enable ssh
+    sudo systemctl start ssh
+    echo "[i] SSH service enabled and started"
+elif sudo systemctl unmask sshd 2>/dev/null; then
+    echo "[i] SSHD service unmasked"
+    sudo systemctl enable sshd
+    sudo systemctl start sshd
+    echo "[i] SSHD service enabled and started"
 else
-    echo "[!] Warning: Could not enable SSH service (tried 'ssh' and 'sshd')"
+    echo "[!] Warning: Could not unmask SSH service (tried 'ssh' and 'sshd')"
 fi
 
 # Enable and start other services
