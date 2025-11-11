@@ -69,14 +69,14 @@ if ! id -u webmaster >/dev/null 2>&1; then
     sudo useradd -m -s /bin/bash webmaster
 fi
 
-# Configure SSH - disable password authentication and root login
-echo "[+] Configuring SSH for key-based authentication only..."
+# Configure SSH - enable password authentication and pubkey authentication
+echo "[+] Configuring SSH with password authentication enabled..."
 sudo mkdir -p /var/run/sshd
 # Append authoritative settings to avoid brittle sed matches
 {
     echo ''
-    echo '# Sewercide hardening'
-    echo 'PasswordAuthentication no'
+    echo '# Sewercide SSH configuration'
+    echo 'PasswordAuthentication yes'
     echo 'PermitRootLogin no'
     echo 'ChallengeResponseAuthentication no'
     echo 'UsePAM yes'
@@ -170,8 +170,20 @@ fi
 
 # Enable and start services
 echo "[+] Enabling and starting services..."
-# Use || true to continue even if service doesn't exist
-sudo systemctl enable ssh 2>/dev/null || echo "[!] SSH service not available"
+
+# Enable SSH (try both 'ssh' and 'sshd' service names)
+echo "[+] Enabling SSH service..."
+if sudo systemctl enable ssh 2>/dev/null; then
+    echo "[i] SSH service enabled"
+    sudo systemctl start ssh || echo "[!] Warning: Could not start ssh service"
+elif sudo systemctl enable sshd 2>/dev/null; then
+    echo "[i] SSHD service enabled"
+    sudo systemctl start sshd || echo "[!] Warning: Could not start sshd service"
+else
+    echo "[!] Warning: Could not enable SSH service (tried 'ssh' and 'sshd')"
+fi
+
+# Enable and start other services
 sudo systemctl enable nginx 2>/dev/null || echo "[!] Nginx service not available"
 sudo systemctl enable "${PHP_FPM_SERVICE}" 2>/dev/null || echo "[!] PHP-FPM service not available"
 sudo systemctl enable rsyslog 2>/dev/null || echo "[!] Rsyslog service not available"
@@ -179,8 +191,14 @@ sudo systemctl enable rsyslog 2>/dev/null || echo "[!] Rsyslog service not avail
 sudo systemctl restart rsyslog 2>/dev/null || echo "[!] Could not restart rsyslog"
 sudo systemctl restart "${PHP_FPM_SERVICE}" 2>/dev/null || echo "[!] Could not restart ${PHP_FPM_SERVICE}"
 sudo systemctl restart nginx 2>/dev/null || echo "[!] Could not restart nginx"
-sudo systemctl restart ssh 2>/dev/null || sudo systemctl restart sshd 2>/dev/null || echo "[!] Could not restart SSH"
+
+# Verify SSH is running
+if sudo systemctl is-active --quiet ssh || sudo systemctl is-active --quiet sshd; then
+    echo "[+] SSH service is running"
+else
+    echo "[!] Warning: SSH service may not be running"
+fi
 
 echo "=== Installation Complete ==="
 echo "Web application: http://<IP>:8080"
-echo "SSH: Key-based authentication only on port 22"
+echo "SSH: Password and key-based authentication enabled on port 22"
