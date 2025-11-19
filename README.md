@@ -2,6 +2,11 @@
 
 **GitHub Repository:** https://github.com/andris9/sewercide-ctf
 
+## Related Packages
+
+- **Banner Package:** https://github.com/andris9/sewercide-banner - Challenge briefing HTML content
+- **Static IP Setter:** https://github.com/andris9/static-ip-setter - Network configuration utility used by this exercise
+
 ## Purpose
 
 This Deputy package serves as a **reference example** for creating Open Cyber Range (OCR) exercises targeting Linux/web environments. It demonstrates a multi-VM CTF deployment with network isolation, feature packages, and banner integration.
@@ -28,8 +33,17 @@ Participants are tasked with infiltrating Sewercide Plumbing Co.'s development w
 
 **Multi-VM Network:**
 
-- **Kali Linux 2025.2** (10.1.1.10) - Attacker machine with full pentesting suite
+- **Kali Linux 2025.2** (10.1.1.10) - Standard Kali Linux image with full pentesting suite
+  - Base image: `kali_2025_2`
+  - Default credentials: `kali` / `kali`
+  - No additional configuration applied (standard Kali installation)
+
 - **Ubuntu 24.04 Server** (10.1.1.20) - Target server running vulnerable web application
+  - Base image: `ubuntu2404-base-web`
+  - Pre-installed: SSH, nginx, PHP 8.3, MySQL
+  - Services disabled by default: SSH, nginx, MySQL, PHP-FPM
+  - Services enabled by exercise install script as needed
+
 - **Virtual Network Switch** - Isolated network segment (10.1.1.0/24)
 
 **Challenge Flow:**
