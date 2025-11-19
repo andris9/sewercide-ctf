@@ -1,11 +1,11 @@
 # Sewercide CTF Challenge - Reference Deputy Package
 
-**GitHub Repository:** https://github.com/andris9/sewercide-ctf
+**GitHub Repository:** [github.com/andris9/sewercide-ctf](https://github.com/andris9/sewercide-ctf)
 
 ## Related Packages
 
-- **Banner Package:** https://github.com/andris9/sewercide-banner - Challenge briefing HTML content
-- **Static IP Setter:** https://github.com/andris9/static-ip-setter - Network configuration utility used by this exercise
+- **Banner Package:** [github.com/andris9/sewercide-banner](https://github.com/andris9/sewercide-banner) - Challenge briefing HTML content
+- **Static IP Setter:** [github.com/andris9/static-ip-setter](https://github.com/andris9/static-ip-setter) - Network configuration utility used by this exercise
 
 ## Purpose
 
@@ -34,11 +34,13 @@ Participants are tasked with infiltrating Sewercide Plumbing Co.'s development w
 **Multi-VM Network:**
 
 - **Kali Linux 2025.2** (10.1.1.10) - Standard Kali Linux image with full pentesting suite
+
   - Base image: `kali_2025_2`
   - Default credentials: `kali` / `kali`
   - No additional configuration applied (standard Kali installation)
 
 - **Ubuntu 24.04 Server** (10.1.1.20) - Target server running vulnerable web application
+
   - Base image: `ubuntu2404-base-web`
   - Pre-installed: SSH, nginx, PHP 8.3, MySQL
   - Services disabled by default: SSH, nginx, MySQL, PHP-FPM
@@ -67,7 +69,7 @@ This package demonstrates:
 3. **Feature package structure** for software installation
 4. **Provisioning script patterns** (user creation, service config, cleanup)
 5. **Banner integration** for participant briefing
-6. **SDL file structure** with comprehensive comments
+6. **SDL file structure** with excersise setup
 
 ### Adapting for Your Exercise
 
@@ -119,9 +121,6 @@ deputy publish
 2. **Configure Deployment Parameters**:
    - Deployment group: Specify deployment group name
    - Deployment name: Enter descriptive name for this instance
-   - Start time: Set deployment start time
-   - End time: Set deployment end time
-   - Number of deployments: Typically `1`
    - AD Group: Specify Active Directory group
 3. **Add Deployment** - Click "Add" to create the deployment instance
 
@@ -129,7 +128,7 @@ deputy publish
 
 1. **Open Deployment** - Navigate to the created deployment from the Deployments list
 2. **Open Entity Selector** - Access the deployment's Entity Connector screen
-3. **Connect Participant** - Assign the single participant for this deployment:
+3. **Connect Participant** - Assign the participant for this deployment:
    - Entity: `red-team.participant` (use dot notation for nested entities)
    - Username: Enter participant's username
    - Click "Connect" to assign participant to entity

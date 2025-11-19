@@ -101,8 +101,8 @@ type = "feature"
 # Parameters:
 # - type: Execution method (service = run script, configuration = copy files)
 # - action: Script to execute (must be in assets and have executable permissions)
-# - restarts: Whether to restart on VM reboot (false = runs once during provisioning)
+# - restarts: boolean that determines if a machine restarts after file copy or execution operations
 [feature]
 type = "service"                           # Execute a script via systemd
 action = "/tmp/sewercide-setup/install.sh" # Path to the script (from assets)
-restarts = false                           # Run once during provisioning, not on reboot
+restarts = false                           # No need to restart the machine after installation
