@@ -79,6 +79,45 @@ This package demonstrates:
 deputy publish
 ```
 
+### Deploying in Ranger
+
+#### Creating the Exercise
+
+1. **Create New Exercise** - In Ranger, create a new exercise
+2. **Configure Dashboard**:
+   - Exercise name: Enter exercise name (e.g., "Sewercide Web")
+   - Deployment group: Specify deployment group
+   - AD Group: Specify Active Directory group
+3. **Import SDL** - Copy the contents of `sewercide-ctf.sdl` and paste into the Scenario SDL text area
+4. **Submit Dashboard Changes** - Click "Submit" button to save exercise configuration
+5. **Configure Banner** - Navigate to the Banner screen and select banner from Deputy:
+   - Click "Get banner from Deputy package"
+   - Package name: `sewercide-banner`
+   - Package version: Select latest version
+   - Click "Add" to attach banner to exercise
+   - Scroll down and click "Update" to apply banner changes
+
+#### Creating a Deployment
+
+1. **Create New Deployment** - Click "Create a new deployment" button
+2. **Configure Deployment Parameters**:
+   - Deployment group: Specify deployment group name
+   - Deployment name: Enter descriptive name for this instance
+   - Start time: Set deployment start time
+   - End time: Set deployment end time
+   - Number of deployments: Typically `1`
+   - AD Group: Specify Active Directory group
+3. **Add Deployment** - Click "Add" to create the deployment instance
+
+#### Assigning Participants
+
+1. **Open Deployment** - Navigate to the created deployment from the Deployments list
+2. **Open Entity Selector** - Access the deployment's Entity Connector screen
+3. **Connect Participant** - Assign the single participant for this deployment:
+   - Entity: `red-team.participant` (use dot notation for nested entities)
+   - Username: Enter participant's username
+   - Click "Connect" to assign participant to entity
+
 ## License
 
 MIT License - Free to use as reference for your own OCR exercises.

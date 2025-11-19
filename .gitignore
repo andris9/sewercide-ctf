@@ -32,6 +32,9 @@ $RECYCLE.BIN/
 .settings/
 .claude/
 
+# Claude Code documentation
+CLAUDE.md
+
 # Deputy credentials (IMPORTANT - never commit tokens!)
 .deputy/
 credentials.toml

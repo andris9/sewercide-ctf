@@ -8,8 +8,7 @@
 # - infrastructure: Network topology and VM counts
 # - nodes: VM specifications (images, resources, roles, features)
 # - features: Deputy packages and configurations to apply
-# - entities: Participant and target role definitions
-# - scripts: Exercise timeline and duration
+# - entities: Team and participant role definitions
 #
 # DEPLOYMENT FLOW:
 # 1. OCR reads this SDL file to understand exercise requirements
@@ -17,7 +16,6 @@
 # 3. Provisions VMs according to nodes specifications
 # 4. Applies features (Deputy packages) to designated roles
 # 5. Assigns entities (participants) to their respective VMs
-# 6. Starts exercise timeline as defined in scripts section
 
 name: Sewercide CTF Challenge
 description: Web exploitation challenge featuring argument injection vulnerability
@@ -136,41 +134,42 @@ features:
     # No environment vars needed - all config is in the package itself
 
 # ENTITIES SECTION
-# Defines participant and target roles for the exercise.
-# Entities are mapped to VM roles in the nodes section.
+# Defines team structure and participant/target roles for the exercise.
+# Entities are organized hierarchically with teams at the top level and
+# individual entities nested within each team.
+#
+# Structure:
+# - Team level (red-team, blue-team): Defines team role (Red/Blue)
+# - Entity level (participant, target): Individual entities within the team
 #
 # Entity role types (case-sensitive):
 # - Red: Attacker/participant role (gets VM access in OCR platform)
 # - Blue: Defender/target role (typically admin-only, no participant access)
 #
+# Entity Selection in Ranger:
+# When creating deployments in Ranger, participants select entities using
+# dot notation: "team-name.entity-name" (e.g., "red-team.participant")
+# This appears in the Entity Connector screen's Entity Selector dropdown.
+#
 # Participants assigned to "Red" entities get access to VMs where their
 # entity is listed in roles.entities (e.g., attacker-kali VM in this exercise).
 entities:
-  # Participant entity (Red team / attacker)
-  participant:
-    name: "CTF Participant"
-    role: Red  # Red role = gets VM access in OCR platform
-    description: "CTF participant attacking from Kali Linux"
-    # This entity is referenced in attacker-kali node's kali-user role
+  # Red team - Attackers/Participants
+  red-team:
+    role: Red
+    entities:
+      participant:
+        name: "CTF Participant"
+        role: Red  # Red role = gets VM access in OCR platform
+        description: "CTF participant attacking from Kali Linux"
+        # This entity is referenced in attacker-kali node's kali-user role
 
-  # Target entity (Blue team / defender)
-  target:
-    name: "Target Server"
-    role: Blue  # Blue role = typically admin-only, no participant access
-    description: "Sewercide Plumbing web server containing the flag"
-    # This entity is referenced in sewercide-server node's server-user role
-
-# SCRIPTS SECTION
-# Defines the exercise timeline and duration.
-# The 'main' script is required and sets the exercise timeframe.
-#
-# Timeline parameters:
-# - start-time: When exercise begins (0 = immediate start)
-# - end-time: Exercise duration (supports units: hour, minute, second)
-# - speed: Time multiplier (1 = real-time, >1 = accelerated, <1 = slowed)
-scripts:
-  # Main exercise timeline (required)
-  main:
-    start-time: 0      # Exercise starts immediately after deployment
-    end-time: 4 hour   # Exercise runs for 4 hours
-    speed: 1           # Real-time (no time acceleration)
+  # Blue team - Defenders/Targets
+  blue-team:
+    role: Blue
+    entities:
+      target:
+        name: "Target Server"
+        role: Blue  # Blue role = typically admin-only, no participant access
+        description: "Sewercide Plumbing web server containing the flag"
+        # This entity is referenced in sewercide-server node's server-user role
