@@ -1,89 +1,176 @@
+# Sewercide CTF Challenge - SDL Deployment Configuration
+#
+# This SDL (Scenario Description Language) file defines the complete infrastructure
+# and deployment configuration for the Open Cyber Range exercise.
+#
+# SDL STRUCTURE OVERVIEW:
+# - name/description/version: Exercise metadata
+# - infrastructure: Network topology and VM counts
+# - nodes: VM specifications (images, resources, roles, features)
+# - features: Deputy packages and configurations to apply
+# - entities: Participant and target role definitions
+# - scripts: Exercise timeline and duration
+#
+# DEPLOYMENT FLOW:
+# 1. OCR reads this SDL file to understand exercise requirements
+# 2. Creates virtual network switch and VMs based on infrastructure section
+# 3. Provisions VMs according to nodes specifications
+# 4. Applies features (Deputy packages) to designated roles
+# 5. Assigns entities (participants) to their respective VMs
+# 6. Starts exercise timeline as defined in scripts section
+
 name: Sewercide CTF Challenge
 description: Web exploitation challenge featuring argument injection vulnerability
 version: 0.2.23
 
+# INFRASTRUCTURE SECTION
+# Defines the network topology and VM instance counts.
+# - switch: Creates a virtual network switch for inter-VM communication
+# - VM definitions: Specify how many instances and which switch they connect to
+# Note: All VMs must be defined here before being configured in 'nodes' section
 infrastructure:
+  # Virtual network switch (provides DHCP to connected VMs)
   switch: 1
 
+  # Attacker VM - Kali Linux for participants
   attacker-kali:
-    count: 1
+    count: 1  # Deploy exactly one instance
     links:
-      - switch
+      - switch  # Connect to the virtual network
 
+  # Target VM - Ubuntu server with vulnerable web application
   sewercide-server:
-    count: 1
+    count: 1  # Deploy exactly one instance
     links:
-      - switch
+      - switch  # Connect to the same virtual network
 
+# NODES SECTION
+# Defines detailed VM specifications including base images, resources, user roles,
+# and which features (Deputy packages) to apply to each VM.
+#
+# IMPORTANT: The switch must also be defined here as a node (type: switch).
+# Each VM node specifies:
+# - type: vm (virtual machine) or switch
+# - source: Base image name from OCR library (e.g., kali_2025_2, ubuntu2404-base-web)
+# - resources: CPU cores and RAM allocation
+# - roles: User accounts and which entities they map to
+# - features: Which Deputy packages to apply (maps feature-name: role-name)
 nodes:
+  # Network switch node (required)
   switch:
     type: switch
 
+  # Attacker VM configuration
   attacker-kali:
     type: vm
-    source: kali_2025_2
+    source: kali_2025_2  # OCR base image: Kali Linux 2025.2
     resources:
       cpu: 2
       ram: 4 GiB
     roles:
+      # Define user role that maps to participant entity
       kali-user:
-        username: kali
+        username: kali  # Default Kali username (password: kali)
         entities:
-          - participant
+          - participant  # Maps to participant entity (gives user access to this VM)
     features:
-      kali-static-ip: kali-user
+      # Apply features to this role using "feature-name: role-name" format
+      kali-static-ip: kali-user  # Assigns static IP 10.1.1.10
 
+  # Target server VM configuration
   sewercide-server:
     type: vm
-    source: ubuntu2404-base-web
+    source: ubuntu2404-base-web  # OCR base image: Ubuntu 24.04 with nginx/php pre-installed
     resources:
       cpu: 2
       ram: 2 GiB
     roles:
+      # Define user role that maps to target entity
       server-user:
-        username: user
+        username: user  # Default username on ubuntu2404-base-web (has NOPASSWD sudo)
         entities:
-          - target
+          - target  # Maps to target entity (admin access only, not for participants)
     features:
-      server-static-ip: server-user
-      sewercide-setup: server-user
+      # Apply multiple features to this role
+      server-static-ip: server-user  # Assigns static IP 10.1.1.20
+      sewercide-setup: server-user   # Installs the vulnerable web application
 
+# FEATURES SECTION
+# Defines Deputy packages and their configurations to be applied to VMs.
+# Features are mapped to roles in the nodes section using "feature-name: role-name".
+#
+# Feature types:
+# - configuration: Applies settings or installs software via Deputy package
+# Each feature specifies:
+# - type: Usually "configuration" for Deputy packages
+# - source: Deputy package name (must be published in Deputy registry)
+# - version: Specific package version to use
+# - environment: Optional environment variables passed to the package
 features:
+  # Static IP configuration for Kali VM
   kali-static-ip:
     type: configuration
-    source: static-ip-setter
+    source: static-ip-setter  # Deputy package from registry
     version: "1.0.8"
     environment:
-      - STATIC_IP=10.1.1.10/24
-      - IFACE=ens192
-      - SUDO_PASSWORD=kali
+      # Environment variables passed to the static-ip-setter package
+      - STATIC_IP=10.1.1.10/24  # IP address and subnet mask
+      - IFACE=ens192             # Network interface name
+      - SUDO_PASSWORD=kali       # Required for Kali (doesn't have NOPASSWD sudo by default)
 
+  # Static IP configuration for target server
   server-static-ip:
     type: configuration
-    source: static-ip-setter
+    source: static-ip-setter  # Same Deputy package, different config
     version: "1.0.8"
     environment:
-      - STATIC_IP=10.1.1.20/24
+      - STATIC_IP=10.1.1.20/24  # Different IP on same subnet
       - IFACE=ens192
+      # No SUDO_PASSWORD needed - ubuntu2404-base-web has NOPASSWD sudo for 'user'
 
+  # Sewercide CTF challenge installation
   sewercide-setup:
     type: configuration
-    source: sewercide-ctf
-    version: 0.2.23
+    source: sewercide-ctf  # This Deputy package (defined by package.toml in this repo)
+    version: 0.2.23        # Must match version in package.toml and this SDL file
+    # No environment vars needed - all config is in the package itself
 
+# ENTITIES SECTION
+# Defines participant and target roles for the exercise.
+# Entities are mapped to VM roles in the nodes section.
+#
+# Entity role types (case-sensitive):
+# - Red: Attacker/participant role (gets VM access in OCR platform)
+# - Blue: Defender/target role (typically admin-only, no participant access)
+#
+# Participants assigned to "Red" entities get access to VMs where their
+# entity is listed in roles.entities (e.g., attacker-kali VM in this exercise).
 entities:
+  # Participant entity (Red team / attacker)
   participant:
     name: "CTF Participant"
-    role: Red
+    role: Red  # Red role = gets VM access in OCR platform
     description: "CTF participant attacking from Kali Linux"
+    # This entity is referenced in attacker-kali node's kali-user role
 
+  # Target entity (Blue team / defender)
   target:
     name: "Target Server"
-    role: Blue
+    role: Blue  # Blue role = typically admin-only, no participant access
     description: "Sewercide Plumbing web server containing the flag"
+    # This entity is referenced in sewercide-server node's server-user role
 
+# SCRIPTS SECTION
+# Defines the exercise timeline and duration.
+# The 'main' script is required and sets the exercise timeframe.
+#
+# Timeline parameters:
+# - start-time: When exercise begins (0 = immediate start)
+# - end-time: Exercise duration (supports units: hour, minute, second)
+# - speed: Time multiplier (1 = real-time, >1 = accelerated, <1 = slowed)
 scripts:
+  # Main exercise timeline (required)
   main:
-    start-time: 0
-    end-time: 4 hour
-    speed: 1
+    start-time: 0      # Exercise starts immediately after deployment
+    end-time: 4 hour   # Exercise runs for 4 hours
+    speed: 1           # Real-time (no time acceleration)

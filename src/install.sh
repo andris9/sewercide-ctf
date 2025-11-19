@@ -1,4 +1,37 @@
 #!/bin/bash
+#
+# Sewercide CTF Challenge - VM Provisioning Script
+#
+# EXECUTION CONTEXT:
+# This script is executed automatically by Deputy package manager during VM deployment
+# on Open Cyber Range. It runs as the 'user' account (which has NOPASSWD sudo access)
+# on the target Ubuntu server VM.
+#
+# WHEN IT RUNS:
+# - Triggered during OCR exercise deployment when the sewercide-ctf Deputy package
+#   is applied to the sewercide-server VM role
+# - Runs ONCE during initial VM provisioning (not on subsequent boots)
+# - Executed via systemd as defined in package.toml [feature] section
+#
+# HOW IT'S INVOKED:
+# - Deputy copies files listed in package.toml 'assets' to /tmp/sewercide-setup/
+# - Deputy then executes this script: /tmp/sewercide-setup/install.sh
+# - Script path is defined in package.toml: action = "/tmp/sewercide-setup/install.sh"
+#
+# WHAT IT DOES:
+# 1. Creates 'webmaster' user with SSH key authentication
+# 2. Generates random flag file in /etc/flag_*.txt
+# 3. Installs vulnerable PHP web application on port 9999
+# 4. Configures nginx and PHP-FPM to run as webmaster
+# 5. Enables SSH with both password and key-based authentication
+# 6. Cleans up installation traces (logs, history) for CTF realism
+#
+# IMPORTANT NOTES:
+# - Assumes ubuntu2404-base-web base image (nginx/php8.3-fpm pre-installed)
+# - Webmaster user has NO password (SSH key-only access)
+# - SSH key is intentionally exfiltrable via argument injection vulnerability
+# - All setup traces are removed to hide the deployment process from participants
+#
 set -euo pipefail
 
 echo "=== Sewercide CTF Challenge Installation ==="

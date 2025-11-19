@@ -1,50 +1,108 @@
+# Deputy Package Configuration for Sewercide CTF Challenge
+#
+# This file defines a Deputy "feature" package that installs a vulnerable web application
+# on Open Cyber Range VMs. It's referenced in the SDL file's features section.
+#
+# PACKAGE TYPES:
+# - feature: Installs software, applies configurations (this package)
+# - vm: Provides VM base images (.ova files)
+# - exercise: Complete exercise definition with SDL file
+# - banner: Challenge briefing and instructions (e.g., sewercide-banner)
+#
+# HOW THIS WORKS:
+# 1. Deputy copies 'assets' files to specified paths on the target VM
+# 2. Deputy executes the 'action' script defined in [feature] section
+# 3. The action script (install.sh) provisions the CTF challenge
+#
+# PUBLISHING:
+# To publish this package to Deputy registry:
+# 1. Update version in this file and sewercide-ctf.sdl
+# 2. Run: deputy publish
+#
+# The package version must match the version referenced in sewercide-ctf.sdl
+
+# PACKAGE METADATA
+# Standard Deputy package information displayed in the registry
 [package]
 name = "sewercide-ctf"
 description = "Sewercide Plumbing CTF Challenge - Web argument injection vulnerability"
-version = "0.2.23"
-authors = ["Andris <andris@postalsys.com>"]
-license = "MIT"
-readme = "README.md"
+
+version = "0.2.23"   # Must match version in sewercide-ctf.sdl
+readme = "README.md" # Package documentation for Deputy catalogue
+
 categories = ["ctf", "web-exploitation", "argument-injection"]
 
+authors = ["Andris <andris@postalsys.com>"]
+license = "MIT"
+
+# ASSETS SECTION
+# Files to copy from this repository to the target VM during deployment.
+# Format: [source_path, destination_path, permissions]
+#
+# IMPORTANT:
+# - Source paths are relative to this package.toml file
+# - Destination paths are absolute paths on the target VM
+# - Permissions are Unix octal format (755 = rwxr-xr-x, 644 = rw-r--r--)
+# - All files are copied BEFORE the action script executes
+# - Common destination: /tmp/sewercide-setup/ (cleaned up after install)
 assets = [
+    # Main provisioning script (executable)
     [
-        "src/install.sh",
-        "/tmp/sewercide-setup/install.sh",
-        "755",
+        "src/install.sh",                  # Source: Local file in this repo
+        "/tmp/sewercide-setup/install.sh", # Destination: Temp directory on VM
+        "755",                             # Permissions: Executable (rwxr-xr-x)
     ],
+
+    # Web application files (PHP)
     [
-        "src/www/index.php",
+        "src/www/index.php",                  # Main web application (single-file router)
         "/tmp/sewercide-setup/www/index.php",
-        "644",
+        "644",                                # Permissions: Readable (rw-r--r--)
     ],
     [
-        "src/www/phpinfo.php",
+        "src/www/phpinfo.php",                  # Diagnostic page (runs phpinfo())
         "/tmp/sewercide-setup/www/phpinfo.php",
         "644",
     ],
+
+    # Shell script with intentional vulnerability
     [
-        "src/generate-personal-pricing.sh",
+        "src/generate-personal-pricing.sh",                  # Vulnerable script (argument injection)
         "/tmp/sewercide-setup/generate-personal-pricing.sh",
-        "755",
+        "755",                                               # Permissions: Executable
     ],
+
+    # Configuration and assets
     [
-        "src/nginx.conf",
+        "src/nginx.conf",                  # Nginx configuration for port 8080
         "/tmp/sewercide-setup/nginx.conf",
         "644",
     ],
     [
-        "src/pricing-template.pdf",
+        "src/pricing-template.pdf",                  # PDF template used by pricing script
         "/tmp/sewercide-setup/pricing-template.pdf",
         "644",
     ],
-] # Files to be copied into the VM
+]
 
-# Main content: feature (service) that installs the web challenge
+# CONTENT SECTION
+# Defines what type of Deputy package this is.
+# "feature" type means this package applies configuration or installs software.
 [content]
 type = "feature"
 
+# FEATURE SECTION
+# Defines how this feature is executed on the target VM.
+#
+# Feature types:
+# - service: Runs a script/command via systemd (this package)
+# - configuration: Applies static configuration files
+#
+# Parameters:
+# - type: Execution method (service = run script, configuration = copy files)
+# - action: Script to execute (must be in assets and have executable permissions)
+# - restarts: Whether to restart on VM reboot (false = runs once during provisioning)
 [feature]
-type = "service"
-action = "/tmp/sewercide-setup/install.sh"
-restarts = false
+type = "service"                           # Execute a script via systemd
+action = "/tmp/sewercide-setup/install.sh" # Path to the script (from assets)
+restarts = false                           # Run once during provisioning, not on reboot
