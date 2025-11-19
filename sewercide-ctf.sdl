@@ -19,7 +19,7 @@
 
 name: Sewercide CTF Challenge
 description: Web exploitation challenge featuring argument injection vulnerability
-version: 0.2.28
+version: 0.2.29
 
 # INFRASTRUCTURE SECTION
 # Defines the network topology and VM instance counts.
@@ -130,7 +130,7 @@ features:
   sewercide-setup:
     type: configuration
     source: sewercide-ctf  # This Deputy package (defined by package.toml in this repo)
-    version: 0.2.28        # Must match version in package.toml and this SDL file
+    version: 0.2.29        # Must match version in package.toml and this SDL file
     # No environment vars needed - all config is in the package itself
 
 # ENTITIES SECTION
