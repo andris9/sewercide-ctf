@@ -70,7 +70,7 @@ nodes:
       kali-user:
         username: kali  # Default Kali username (password: kali)
         entities:
-          - participant  # Maps to participant entity (gives user access to this VM)
+          - red-team.participant  # Maps to participant entity (gives user access to this VM)
     features:
       # Apply features to this role using "feature-name: role-name" format
       kali-static-ip: kali-user  # Assigns static IP 10.1.1.10
@@ -87,7 +87,7 @@ nodes:
       server-user:
         username: user  # Default username on ubuntu2404-base-web (has NOPASSWD sudo)
         entities:
-          - target  # Maps to target entity (admin access only, not for participants)
+          - blue-team.target  # Maps to target entity (admin access only, not for participants)
     features:
       # Apply multiple features to this role
       server-static-ip: server-user  # Assigns static IP 10.1.1.20
@@ -162,7 +162,7 @@ entities:
         name: "CTF Participant"
         role: Red  # Red role = gets VM access in OCR platform
         description: "CTF participant attacking from Kali Linux"
-        # This entity is referenced in attacker-kali node's kali-user role
+        # This entity is referenced in attacker-kali node as "red-team.participant"
 
   # Blue team - Defenders/Targets
   blue-team:
@@ -172,4 +172,4 @@ entities:
         name: "Target Server"
         role: Blue  # Blue role = typically admin-only, no participant access
         description: "Sewercide Plumbing web server containing the flag"
-        # This entity is referenced in sewercide-server node's server-user role
+        # This entity is referenced in sewercide-server node as "blue-team.target"
