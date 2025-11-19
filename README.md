@@ -1,5 +1,7 @@
 # Sewercide CTF Challenge - Reference Deputy Package
 
+**GitHub Repository:** https://github.com/andris9/sewercide-ctf
+
 ## Purpose
 
 This Deputy package serves as a **reference example** for creating Open Cyber Range (OCR) exercises targeting Linux/web environments. It demonstrates a multi-VM CTF deployment with network isolation, feature packages, and banner integration.
