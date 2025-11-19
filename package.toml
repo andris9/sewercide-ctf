@@ -27,7 +27,7 @@
 name = "sewercide-ctf"
 description = "Sewercide Plumbing CTF Challenge - Web argument injection vulnerability"
 
-version = "0.2.25"   # Must match version in sewercide-ctf.sdl
+version = "0.2.26"   # Must match version in sewercide-ctf.sdl
 readme = "README.md" # Package documentation for Deputy catalogue
 
 categories = ["ctf", "web-exploitation", "argument-injection"]
